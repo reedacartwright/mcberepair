@@ -23,10 +23,12 @@ int main(int argc, char* argv[]) {
     leveldb::Options options;
 
     // create a bloom filter to quickly tell if a key is in the database or not
-    options.filter_policy = leveldb::NewBloomFilterPolicy(10);
+    auto filter_policy = std::unique_ptr<const leveldb::FilterPolicy>{leveldb::NewBloomFilterPolicy(10)};
+    options.filter_policy = filter_policy.get();
 
     // create a 40 mb cache (we use this on ~1gb devices)
-    options.block_cache = leveldb::NewLRUCache(40 * 1024 * 1024);
+    auto block_cache = std::unique_ptr<leveldb::Cache>{ leveldb::NewLRUCache(40 * 1024 * 1024) };
+    options.block_cache = block_cache.get();
 
     // create a 4mb write buffer, to improve compression and touch the disk less
     options.write_buffer_size = 4 * 1024 * 1024;
