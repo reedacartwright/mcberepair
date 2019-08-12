@@ -30,3 +30,26 @@
 *.exe
 *.out
 *.app
+
+# Build Dir
+build/*
+!build/.gitkeep
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Ignore ctag output
+.tags
+.tags_sorted_by_file
+
+# Ignore workspace
+*.sublime-workspace
