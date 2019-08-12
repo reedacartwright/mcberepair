@@ -1,7 +1,11 @@
 #include <cassert>
 #include <cstdio>
-#include <iostream>
 #include <memory>
+
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
 
 #include "leveldb/cache.h"
 #include "leveldb/db.h"
@@ -12,15 +16,15 @@
 
 #include "mcbekey.hpp"
 
-int main(int argc, char *argv[]) {
-    if(argc < 2) {
-        printf("Usage: %s <minecraft_world_dir> < list.txt\n", argv[0]);
+int main(int argc, char* argv[]) {
+    if(argc < 3) {
+        printf("Usage: %s <minecraft_world_dir> <key> > output.bin\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     class NullLogger : public leveldb::Logger {
        public:
-        void Logv(const char *, va_list) override {}
+        void Logv(const char*, va_list) override {}
     };
 
     leveldb::Options options;
@@ -50,11 +54,18 @@ int main(int argc, char *argv[]) {
     auto zlib_compressor = std::make_unique<leveldb::ZlibCompressor>();
     options.compressors[1] = zlib_compressor.get();
 
+    // create a reusable memory space for decompression so it allocates less
+    leveldb::ReadOptions readOptions;
+    auto decompress_allocator =
+        std::make_unique<leveldb::DecompressAllocator>();
+    readOptions.decompress_allocator = decompress_allocator.get();
+    readOptions.verify_checksums = true;
+
     leveldb::Status status;
 
     std::string path = std::string(argv[1]) + "/db";
 
-    leveldb::DB *pdb = nullptr;
+    leveldb::DB* pdb = nullptr;
     status = leveldb::DB::Open(options, path.c_str(), &pdb);
     auto db = std::unique_ptr<leveldb::DB>(pdb);
 
@@ -62,16 +73,26 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "ERROR: Opening '%s' failed.\n", path.c_str());
         return EXIT_FAILURE;
     }
-    std::string line;
-    while(std::getline(std::cin, line)) {
-        printf("Deleting key '%s'...\n", line.c_str());
-        status = db->Delete(leveldb::WriteOptions(), decode_key(line));
-        if(!status.ok()) {
-            fprintf(stderr, "ERROR: Writing '%s' failed: %s\n", path.c_str(),
-                    status.ToString().c_str());
-            return EXIT_FAILURE;
-        }
+
+    std::string key = decode_key(argv[2]);
+
+    std::string value;
+    status = db->Get(readOptions, key, &value);
+
+    if(!status.ok()) {
+        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
+                status.ToString().c_str());
+        return EXIT_FAILURE;
     }
 
+#ifdef _WIN32
+    fflush(stdout);
+    setmode(fileno(stdout), O_BINARY);
+#endif
+
+    int ret = fwrite(value.data(), value.size(),1,stdout);
+    if(ret < 1) {
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }

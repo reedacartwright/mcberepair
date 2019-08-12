@@ -10,8 +10,14 @@ project(mcberepair VERSION 0.1 LANGUAGES CXX)
 
 find_package(LEVELDB_MCPE)
 
-add_executable(listkeys listkeys.cc)
+add_executable(listkeys listkeys.cc base64.cpp)
 target_link_libraries(listkeys LEVELDB_MCPE::LEVELDB_MCPE)
 
-add_executable(rmkeys rmkeys.cc)
+add_executable(rmkeys rmkeys.cc base64.cpp)
 target_link_libraries(rmkeys LEVELDB_MCPE::LEVELDB_MCPE)
+
+add_executable(dumpkey dumpkey.cc base64.cpp)
+target_link_libraries(dumpkey LEVELDB_MCPE::LEVELDB_MCPE)
+
+add_executable(writekey writekey.cc base64.cpp)
+target_link_libraries(writekey LEVELDB_MCPE::LEVELDB_MCPE)

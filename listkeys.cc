@@ -9,6 +9,8 @@
 #include "leveldb/filter_policy.h"
 #include "leveldb/zlib_compressor.h"
 
+#include "mcbekey.hpp"
+
 int main(int argc, char* argv[]) {
     if(argc < 2) {
         printf("Usage: %s <minecraft_world_dir> > list.tsv\n", argv[0]);
@@ -52,6 +54,7 @@ int main(int argc, char* argv[]) {
     auto decompress_allocator =
         std::make_unique<leveldb::DecompressAllocator>();
     readOptions.decompress_allocator = decompress_allocator.get();
+    readOptions.verify_checksums = true;
 
     leveldb::Status status;
 
@@ -69,20 +72,13 @@ int main(int argc, char* argv[]) {
     // Print header
     printf("key\tbytes\tx\tz\tdimension\ttag\tsubchunk\n");
 
-    readOptions.verify_checksums = true;
     auto it = std::unique_ptr<leveldb::Iterator>{db->NewIterator(readOptions)};
 
     for(it->SeekToFirst(); it->Valid(); it->Next()) {
         auto k = it->key();
-        // print a percent-encoded key
-        for(int i = 0; i < k.size(); ++i) {
-            unsigned char c = k[i];
-            if(std::isgraph(c) && c != '%') {
-                printf("%c", c);
-            } else {
-                printf("%%%02X", c);
-            }
-        }
+        // print an encoded key
+        std::string key = encode_key(k.data(), k.size());
+        printf("%s", key.c_str());
         printf("\t%lu", it->value().size());
 
         // Identify keys that might represent chunks
