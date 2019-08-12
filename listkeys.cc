@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
     options.write_buffer_size = 4 * 1024 * 1024;
 
     //disable internal logging. The default logger will still print out things to a file
-    options.info_log = new NullLogger();
+    auto logger = std::make_unique<NullLogger>();
+    options.info_log = logger.get();
 
     //use the new raw-zip compressor to write (and read)
     auto zlib_raw_compressor = std::make_unique<leveldb::ZlibCompressorRaw>(-1);
@@ -46,7 +47,8 @@ int main(int argc, char *argv[]) {
     
     //create a reusable memory space for decompression so it allocates less
     leveldb::ReadOptions readOptions;
-    readOptions.decompress_allocator = new leveldb::DecompressAllocator();
+    auto decompress_allocator = std::make_unique<leveldb::DecompressAllocator>();
+    readOptions.decompress_allocator = decompress_allocator.get();
 
     leveldb::Status status;
 
@@ -62,7 +64,7 @@ int main(int argc, char *argv[]) {
     }
 
     //Print header
-    printf("key\tx\tz\tdimension\ttag\tsubchunk\n");
+    printf("key\tsize\tx\tz\tdimension\ttag\tsubchunk\n");
 
     readOptions.verify_checksums = true;
     auto it = std::unique_ptr<leveldb::Iterator>{db->NewIterator(readOptions)};
@@ -75,9 +77,10 @@ int main(int argc, char *argv[]) {
             if(std::isgraph(c) && c != '%') {
                 printf("%c", c);
             } else {
-                printf("%%%02X",c);                
+                printf("%%%02X",c);
             }
         }
+        printf("\t%lu", it->value().size());
 
         // Identify keys that might represent chunks
         // See https://minecraft.gamepedia.com/Bedrock_Edition_level_format

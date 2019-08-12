@@ -86,7 +86,8 @@ int main(int argc, char *argv[]) {
     options.write_buffer_size = 4 * 1024 * 1024;
 
     //disable internal logging. The default logger will still print out things to a file
-    options.info_log = new NullLogger();
+    auto logger = std::make_unique<NullLogger>();
+    options.info_log = logger.get();
 
     //use the new raw-zip compressor to write (and read)
     auto zlib_raw_compressor = std::make_unique<leveldb::ZlibCompressorRaw>(-1);
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
     }
     std::string line;
     while(std::getline(std::cin, line)) {
-        printf("Deleting key '%s'\n", line.c_str());
+        printf("Deleting key '%s'...\n", line.c_str());
         percent_decode(&line);
         leveldb::Slice k = line;
         status = db->Delete(leveldb::WriteOptions(), k);
