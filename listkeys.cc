@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Print header
-    printf("key\tsize\tx\tz\tdimension\ttag\tsubchunk\n");
+    printf("key\tbytes\tx\tz\tdimension\ttag\tsubchunk\n");
 
     readOptions.verify_checksums = true;
     auto it = std::unique_ptr<leveldb::Iterator>{db->NewIterator(readOptions)};
