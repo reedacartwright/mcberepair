@@ -86,12 +86,14 @@ int main(int argc, char* argv[]) {
         if(k.size() == 9 || k.size() == 10 || k.size() == 13 ||
            k.size() == 14) {
             // read x and z coordinates
-            int x = k[0] | (k[1] << 8) | (k[2] << 16) | (k[3] << 24);
-            int z = k[4] | (k[5] << 8) | (k[6] << 16) | (k[7] << 24);
+            int x; //= //k[0] | (k[1] << 8) | (k[2] << 16) | (k[3] << 24);
+            int z; //= k[4] | (k[5] << 8) | (k[6] << 16) | (k[7] << 24);
+            memcpy(&x, k.data()+0, 4);
+            memcpy(&z, k.data()+4, 4);
             // read the dimension coordinate
             int d = 0;
             if(k.size() >= 13) {
-                d = k[8] | (k[9] << 8) | (k[10] << 16) | (k[11] << 24);
+                memcpy(&d, k.data()+8, 4);
             }
             // read the tag
             int tag = (k.size() >= 13) ? k[12] : k[8];
