@@ -34,6 +34,7 @@
 #include "db.hpp"
 
 #include "mcbekey.hpp"
+#include "slurp.hpp"
 
 int main(int argc, char* argv[]) {
     if(argc < 3) {
@@ -47,8 +48,7 @@ int main(int argc, char* argv[]) {
 #endif
 
     // slurp from stdin into value before we open db
-    std::ostringstream slurp;
-    slurp << std::cin.rdbuf();
+    auto value = mcberepair::slurp_string(std::cin);
 
     // construct path for Minecraft BE database
     std::string path = std::string(argv[1]) + "/db";
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 
     std::string key = decode_key(argv[2]);
 
-    leveldb::Status status = db().Put({}, key, slurp.str());
+    leveldb::Status status = db().Put({}, key, value);
 
     if(!status.ok()) {
         fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
