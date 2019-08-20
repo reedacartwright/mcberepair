@@ -1,0 +1,63 @@
+{
+	"folders":
+	[
+		{
+			"path": "@CMAKE_SOURCE_DIR@",
+			"folder_exclude_patterns": ["build"]
+		}
+	],
+	"settings": {
+    	"tab_size": 4,
+    	"translate_tabs_to_spaces": true,
+        "compile_commands": "${project_path}",
+        "ecc_flags_sources": [
+            {"file": "compile_commands.json", "search_in": "${project_path}"},
+            {"file": "CMakeLists.txt"}
+        ],
+        "ecc_header_to_source_mapping": [
+            "./", "../", "../../", "../src/", "../lib/", "../../lib/"
+        ]
+	},
+    "SublimeLinter": {
+        "linters":
+        {
+        	"clang": {
+				"extra_flags": "-Wall -std=c++17 -Wno-pragma-once-outside-header",
+            	"include_dirs": [
+                	"${project_path}/../../src/include/",
+                	"${project_path}/src",
+                	"/usr/include/eigen3",
+                	"/usr/include/eigen3/unsupported"
+            	],
+                "disable": true
+            }
+        }
+    },
+	"build_systems":
+	[
+		{
+			"name": "@PROJECT_NAME@ - all",
+			"cmd": ["@CMAKE_COMMAND@", "--build", "${project_path}", "--target", "all"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+		},
+		{
+			"name": "@PROJECT_NAME@ - test",
+			"cmd": ["@CMAKE_COMMAND@", "--build", "${project_path}", "--target", "test"],
+			"working_dir": "${project_path}",
+			"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+		},
+        {
+            "name": "@PROJECT_NAME@ - clean",
+            "cmd": ["@CMAKE_COMMAND@", "--build", "${project_path}", "--target", "clean"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+        },
+        {
+            "name": "@PROJECT_NAME@ - check_all",
+            "cmd": ["@CMAKE_COMMAND@", "--build", "${project_path}", "--target", "check_all"],
+            "working_dir": "${project_path}",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+        },
+    ]
+}

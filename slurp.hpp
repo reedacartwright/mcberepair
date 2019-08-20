@@ -47,6 +47,7 @@ std::string slurp_string(T &in) {
         g = in.gcount();
         sz += g;
     }
+    // shrink buffer
     buffer.resize(sz);
     return buffer;
 }
