@@ -29,82 +29,47 @@
 #include <fcntl.h>
 #endif
 
-#include "leveldb/cache.h"
-#include "leveldb/db.h"
-#include "leveldb/decompress_allocator.h"
-#include "leveldb/env.h"
-#include "leveldb/filter_policy.h"
-#include "leveldb/zlib_compressor.h"
+#include "db.hpp"
 
 #include "mcbekey.hpp"
 
 int main(int argc, char* argv[]) {
+    std::string value;
+
     if(argc < 3) {
         printf("Usage: %s <minecraft_world_dir> <key> > output.bin\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    class NullLogger : public leveldb::Logger {
-       public:
-        void Logv(const char*, va_list) override {}
-    };
+    // use RAII to close the db before dumping value
+    {
+	    // construct path for Minecraft BE database
+	    std::string path = std::string(argv[1]) + "/db";
 
-    leveldb::Options options;
+	    // open the database
+	    mcberepair::DB db{path.c_str()};
 
-    // create a bloom filter to quickly tell if a key is in the database or not
-    auto filter_policy = std::unique_ptr<const leveldb::FilterPolicy>{leveldb::NewBloomFilterPolicy(10)};
-    options.filter_policy = filter_policy.get();
+	    if(!db) {
+	        fprintf(stderr, "ERROR: Opening '%s' failed.\n", path.c_str());
+	        return EXIT_FAILURE;
+	    }
 
-    // create a 40 mb cache (we use this on ~1gb devices)
-    auto block_cache = std::unique_ptr<leveldb::Cache>{ leveldb::NewLRUCache(40 * 1024 * 1024) };
-    options.block_cache = block_cache.get();
+	    // create a reusable memory space for decompression so it allocates less
+	    leveldb::ReadOptions readOptions;
+	    auto decompress_allocator =
+	        std::make_unique<leveldb::DecompressAllocator>();
+	    readOptions.decompress_allocator = decompress_allocator.get();
+	    readOptions.verify_checksums = true;
 
-    // create a 4mb write buffer, to improve compression and touch the disk less
-    options.write_buffer_size = 4 * 1024 * 1024;
+	    std::string key = decode_key(argv[2]);
 
-    // disable internal logging. The default logger will still print out things
-    // to a file
-    auto logger = std::make_unique<NullLogger>();
-    options.info_log = logger.get();
+	    leveldb::Status status = db().Get(readOptions, key, &value);
 
-    // use the new raw-zip compressor to write (and read)
-    auto zlib_raw_compressor = std::make_unique<leveldb::ZlibCompressorRaw>(-1);
-    options.compressors[0] = zlib_raw_compressor.get();
-
-    // also setup the old, slower compressor for backwards compatibility. This
-    // will only be used to read old compressed blocks.
-    auto zlib_compressor = std::make_unique<leveldb::ZlibCompressor>();
-    options.compressors[1] = zlib_compressor.get();
-
-    // create a reusable memory space for decompression so it allocates less
-    leveldb::ReadOptions readOptions;
-    auto decompress_allocator =
-        std::make_unique<leveldb::DecompressAllocator>();
-    readOptions.decompress_allocator = decompress_allocator.get();
-    readOptions.verify_checksums = true;
-
-    leveldb::Status status;
-
-    std::string path = std::string(argv[1]) + "/db";
-
-    leveldb::DB* pdb = nullptr;
-    status = leveldb::DB::Open(options, path.c_str(), &pdb);
-    auto db = std::unique_ptr<leveldb::DB>(pdb);
-
-    if(!status.ok()) {
-        fprintf(stderr, "ERROR: Opening '%s' failed.\n", path.c_str());
-        return EXIT_FAILURE;
-    }
-
-    std::string key = decode_key(argv[2]);
-
-    std::string value;
-    status = db->Get(readOptions, key, &value);
-
-    if(!status.ok()) {
-        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
-                status.ToString().c_str());
-        return EXIT_FAILURE;
+	    if(!status.ok()) {
+	        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
+	                status.ToString().c_str());
+	        return EXIT_FAILURE;
+	    }
     }
 
 #ifdef _WIN32
