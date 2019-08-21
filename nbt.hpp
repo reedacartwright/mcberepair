@@ -20,38 +20,77 @@
 # SOFTWARE.
 */
 
-#ifndef MCBEREPAIR_SLURP_HPP
-#define MCBEREPAIR_SLURP_HPP
+#ifndef MCBEREPAIR_NBT_HPP
+#define MCBEREPAIR_NBT_HPP
 
-#include <string>
+#include <variant>
+#include <string_view>
 
 namespace mcberepair {
 
-template<typename T>
-std::string slurp_string(T &in) {
-    // create buffer
-    std::string buffer(8192, '\0');
-    std::size_t sz = 0;
+enum struct nbt_type: int {
+    END = 0,
+    BYTE = 1,
+    SHORT = 2,
+    INT = 3,
+    LONG = 4,
+    FLOAT = 5,
+    DOUBLE = 6,
+    BYTE_ARRAY = 7,
+    STRING = 8,
+    LIST = 9,
+    COMPOUND = 10,
+    INT_ARRAY = 11,
+    LONG_ARRAY = 12
+};
 
-    // read into buffer
-    in.read(buffer.data()+sz,8192);
-    // count how many values we read
-    std::size_t g = in.gcount();
-    sz += g;
-    while(!in.eof()) {
-        // allocate more space
-        buffer.resize(buffer.size()+8192);
-        // Keep reading
-        in.read(buffer.data()+sz,8192);
-        // count how many values we read
-        g = in.gcount();
-        sz += g;
-    }
-    // shrink buffer
-    buffer.resize(sz);
-    return buffer;
-}
+struct nbt_byte_array_t {
+    int32_t size;
+    int8_t *data;
+};
+
+struct nbt_int_array_t {
+    int32_t size;
+    int32_t *data;
+};
+
+struct nbt_long_array_t {
+    int32_t size;
+    int64_t *data;
+};
+
+struct nbt_string_t {
+    int16_t size;
+    char *data;
+};
+
+struct nbt_compound_t {
 
 };
+
+struct nbt_end_t {
+
+};
+
+struct nbt_list_t {
+    int32_t size;
+    int8_t type;
+};
+
+
+struct nbt_t {
+    std::string_view name;
+    std::variant<int8_t,int16_t,int32_t,int64_t,
+        float,double,
+        nbt_byte_array_t, nbt_int_array_t, nbt_long_array_t,
+        nbt_string_t,
+        nbt_compound_t,
+        nbt_end_t
+        > payload;
+
+};
+
+}
+
 
 #endif
