@@ -27,10 +27,13 @@
 
 namespace mcberepair {
 
-template<typename T>
-std::string slurp_string(T &in) {
+template<typename CharT,
+        typename Traits = std::char_traits<CharT>,
+        typename Allocator = std::allocator<CharT>>
+std::basic_string<CharT,Traits,Allocator>
+slurp_string(std::basic_istream<CharT,Traits> &in) {
     // create buffer
-    std::string buffer(8192, '\0');
+    std::basic_string<CharT,Traits,Allocator> buffer(8192, static_cast<CharT>('\0'));
     std::size_t sz = 0;
 
     // read into buffer
