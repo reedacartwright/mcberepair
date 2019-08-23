@@ -23,12 +23,13 @@
 #include <cassert>
 #include <vector>
 #include <cstring>
+#include <stack>
 
 #include "nbt.hpp"
 
 template<typename T>
 inline
-char* read_val(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+char* read_payload(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
     assert(first != nullptr);
     assert(last != nullptr);
     assert(first <= last);
@@ -46,7 +47,8 @@ char* read_val(char *first, char *last, std::string_view name, std::vector<mcber
 
 template<typename T>
 inline
-char* read_val_array(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+std::enable_if_t<std::is_member_pointer_v<&T::data> && std::is_member_pointer_v<&T::size>, char*>
+read_payload(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
     assert(first != nullptr);
     assert(last != nullptr);
     assert(first <= last);
@@ -68,8 +70,9 @@ char* read_val_array(char *first, char *last, std::string_view name, std::vector
     return first + sizeof(T)*array_size;
 }
 
+template<>
 inline
-char* read_list(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+char* read_payload<mcberepair::nbt_list_t>(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
     assert(first != nullptr);
     assert(last != nullptr);
     assert(first <= last);
@@ -94,6 +97,47 @@ char* read_list(char *first, char *last, std::string_view name, std::vector<mcbe
     return first + sizeof(int32_t);
 }
 
+inline
+char* read_simple_payload(char *p, char *last, std::string_view name,
+    std::vector<mcberepair::nbt_t> *v, mcberepair::nbt_type type) {
+    using nbt_type = mcberepair::nbt_type;
+    switch(type) {
+    case nbt_type::BYTE:
+        p = read_payload<int8_t>(p, last, name, v);
+        break;
+    case nbt_type::SHORT:
+        p = read_payload<int16_t>(p, last, name, v);
+        break;
+    case nbt_type::INT:
+        p = read_payload<int32_t>(p, last, name, v);
+        break;
+    case nbt_type::LONG:
+        p = read_payload<int64_t>(p, last, name, v);
+        break;
+    case nbt_type::FLOAT:
+        p = read_payload<float>(p, last, name, v);
+        break;
+    case nbt_type::DOUBLE:
+        p = read_payload<double>(p, last, name, v);
+        break;
+    case nbt_type::BYTE_ARRAY:
+        p = read_payload<mcberepair::nbt_byte_array_t>(p, last, name, v);
+        break;
+    case nbt_type::STRING:
+        p = read_payload<mcberepair::nbt_string_t>(p, last, name, v);
+        break;
+    case nbt_type::INT_ARRAY:
+        p = read_payload<mcberepair::nbt_int_array_t>(p, last, name, v);
+        break;
+    case nbt_type::LONG_ARRAY:
+        p = read_payload<mcberepair::nbt_long_array_t>(p, last, name, v);
+        break;
+    default:
+        return nullptr;
+    }
+    return p;
+}
+
 bool parse_nbt(char *first, char *last) {
     assert(first != nullptr);
     assert(last != nullptr);
@@ -109,66 +153,73 @@ bool parse_nbt(char *first, char *last) {
 
     char *p = first;
 
-    while(p < last) {
-        // read the type
-        auto type = nbt_type{*p};
-        p += 1;
-        if(type == nbt_type::END) {
-            nbt_data.emplace_back(nullptr, mcberepair::nbt_end_t{});
-            continue;
-        }
-        // read the size of the name
-        if(last-p < 2) {
-            return false; // malformed
-        }
-        uint16_t name_len;
-        memcpy(&name_len, p, sizeof(name_len));
-        p += 2;
-        if(last-p < name_len) {
-            return false;
-        }
-        std::string_view name{p,name_len};
+    //std::stack<nbt_type> type_stack;
+    //std::stack<unsigned int> count_stack; 
 
-        switch(nbt_type{type}) {
+    int payload_index = 0;
+    nbt_type type;
+    while(p < last) {
+        std::string_view name;
+        if(payload_index == 0) {
+            // read the type
+            type = nbt_type{*p};
+            p += 1;
+            if(type == nbt_type::END) {
+                name = {};
+            } else {
+                // read the size of the name
+                if(last-p < 2) {
+                    return false; // malformed
+                }
+                uint16_t name_len;
+                memcpy(&name_len, p, sizeof(name_len));
+                p += 2;
+                if(last-p < name_len) {
+                    return false;
+                }
+                name = {p,name_len};
+            }
+        } else {
+            name = {};
+        }
+ 
+        switch(type) {
             case nbt_type::BYTE:
-                p = read_val<int8_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::SHORT:
-                p = read_val<int16_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::INT:
-                p = read_val<int32_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::LONG:
-                p = read_val<int64_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::FLOAT:
-                p = read_val<float>(p, last, name, &nbt_data);
-                break;
             case nbt_type::DOUBLE:
-                p = read_val<double>(p, last, name, &nbt_data);
-                break;
             case nbt_type::BYTE_ARRAY:
-                p = read_val_array<mcberepair::nbt_byte_array_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::STRING:
-                p = read_val_array<mcberepair::nbt_string_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::INT_ARRAY:
-                p = read_val_array<mcberepair::nbt_int_array_t>(p, last, name, &nbt_data);
-                break;
             case nbt_type::LONG_ARRAY:
-                p = read_val_array<mcberepair::nbt_long_array_t>(p, last, name, &nbt_data);
+                p = read_simple_payload(p, last, name, &nbt_data, type);
+                --payload_count;
                 break;
             case nbt_type::COMPOUND:
-                nbt_data.emplace_back(nullptr, mcberepair::nbt_compound_t{});
+                nbt_data.emplace_back(name, mcberepair::nbt_compound_t{});
+                count_stack.push(payload_count);
+                type_stack.push(type);
+                payload_count = 0;
+                break;
+            case nbt_type::END:
+                nbt_data.emplace_back(name, mcberepair::nbt_end_t{});
+                payload_count = count_stack.top();
+                type = type_stack.top();
+                count_stack.pop();
+                type_stack.pop();
+                --payload_count;
                 break;
             case nbt_type::LIST:
-                p = read_list(p, last, name, &nbt_data);
+                p = read_payload<mcberepair::nbt_list_t>(p, last, name, &nbt_data);
                 if(p == nullptr) {
                     return false;
                 }
-                todo;
+                count_stack.push(payload_count);
+                type_stack.push(type);
+                type = nbt_type{std::get<mcberepair::nbt_list_t>(nbt_data.back().payload).type};
+                payload_count = std::get<mcberepair::nbt_list_t>(nbt_data.back().payload).size;
                 break;
             default:
                 return false;
@@ -176,7 +227,6 @@ bool parse_nbt(char *first, char *last) {
         if(p == nullptr) {
             return false;
         }
-
     }
     return true;
 }
