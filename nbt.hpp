@@ -77,6 +77,10 @@ struct nbt_list_t {
     int8_t type;
 };
 
+struct nbt_list_end_t {
+
+};
+
 
 struct nbt_t {
     std::string_view name;
@@ -85,7 +89,9 @@ struct nbt_t {
         nbt_byte_array_t, nbt_int_array_t, nbt_long_array_t,
         nbt_string_t,
         nbt_compound_t,
-        nbt_end_t
+        nbt_end_t,
+        nbt_list_t,
+        nbt_list_end_t
         > payload;
 
 };
