@@ -257,7 +257,7 @@ bool read_nbt(char *first, char *last, std::vector<mcberepair::nbt_t> *nbt_data)
         }
         p = read_payload(p, last, child_name, nbt_data, type);
     }
-    return true;
+    return (p != nullptr);
 }
 
 const char data[] = "\x09\x0b\0Hello World\x08\x02\0\0\0\x0b\0Hello World\x0b\0Hello_World";
