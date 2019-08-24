@@ -83,8 +83,7 @@ struct nbt_list_end_t {
 
 
 struct nbt_t {
-    std::string_view name;
-    std::variant<int8_t,int16_t,int32_t,int64_t,
+    using payload_t = std::variant<int8_t,int16_t,int32_t,int64_t,
         float,double,
         nbt_byte_array_t, nbt_int_array_t, nbt_long_array_t,
         nbt_string_t,
@@ -92,11 +91,15 @@ struct nbt_t {
         nbt_end_t,
         nbt_list_t,
         nbt_list_end_t
-        > payload;
+        >;
 
+    template<typename Arg>
+    nbt_t(std::string_view n, Arg&& arg) : name{n}, payload{std::forward<Arg>(arg)} {}
+
+    std::string_view name;
+    payload_t payload;
 };
 
 }
-
 
 #endif
