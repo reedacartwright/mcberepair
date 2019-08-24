@@ -74,7 +74,7 @@ struct nbt_end_t {
 
 struct nbt_list_t {
     int32_t size;
-    int8_t type;
+    nbt_type type;
 };
 
 struct nbt_list_end_t {
@@ -83,7 +83,8 @@ struct nbt_list_end_t {
 
 
 struct nbt_t {
-    using payload_t = std::variant<int8_t,int16_t,int32_t,int64_t,
+    using payload_t = std::variant<std::monostate,
+        int8_t,int16_t,int32_t,int64_t,
         float,double,
         nbt_byte_array_t, nbt_int_array_t, nbt_long_array_t,
         nbt_string_t,

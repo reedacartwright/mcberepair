@@ -29,179 +29,264 @@
 
 #include "nbt.hpp"
 
-char* read_payload(char *p, char *last, std::string_view name,
-    std::vector<mcberepair::nbt_t> *v, mcberepair::nbt_type type);
+void read_nbt_impl(char ** const pfirst, char *last, mcberepair::nbt_type type,
+    std::string_view name, std::vector<mcberepair::nbt_t> *v);
 
-char* read_name(char *p, char *last, std::string_view *name) {
-        assert(p != nullptr);
-        assert(last != nullptr);
-        assert(p <= last);
-        assert(name != nullptr);
-        // read the size of the name
-        if(last-p < 2) {
-            return nullptr; // malformed
-        }
-        uint16_t name_len;
-        memcpy(&name_len, p, sizeof(name_len));
-        p += 2;
-        // read the name
-        if(last-p < name_len) {
-            return nullptr;
-        }
-        *name = {p,name_len};
-        p += sizeof(char)*name_len;
-        return p;
-}
-
-template<typename T>
-inline
-char* read_payload_impl(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
-    assert(first != nullptr);
+mcberepair::nbt_type read_type(char ** const pfirst, char *last) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
     assert(last != nullptr);
-    assert(first <= last);
-    assert(v != nullptr);
+    assert(*pfirst <= last);
 
-    if(last-first < sizeof(T)) {
-        return nullptr;
+    //std::cerr << "read_type\n";
+
+    using nbt_type = mcberepair::nbt_type;
+
+    char *p = *pfirst;
+
+    if(p == last) {
+        return nbt_type::END;
     }
-    T val;
-    memcpy(&val, first, sizeof(T));
-    v->emplace_back(name, val);
+    int8_t value;
+    memcpy(&value, p, sizeof(value));
 
-    return first+sizeof(T);
+    *pfirst = p + sizeof(value);
+    return nbt_type{value};
+}
+
+std::string_view read_name(char ** const pfirst, char *last) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
+    assert(last != nullptr);
+    assert(*pfirst <= last);
+
+    //std::cerr << "read_name\n";
+
+    char *p = *pfirst;
+
+    // read the size of the name
+    uint16_t name_len;
+    if(last-p < sizeof(name_len)) {
+        return {}; // malformed
+    }
+    memcpy(&name_len, p, sizeof(name_len));
+    p += sizeof(name_len);
+
+    //std::cerr << "    " << name_len << "\n";
+
+    // read the name
+    if(last-p < name_len) {
+        return {};
+    }
+    *pfirst = p + sizeof(char)*name_len;
+    return {p,name_len};
 }
 
 template<typename T>
 inline
-std::enable_if_t<std::is_member_pointer_v<&T::data> && std::is_member_pointer_v<&T::size>, char*>
-read_payload_impl(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
-    assert(first != nullptr);
+std::enable_if_t<std::is_arithmetic_v<T>,mcberepair::nbt_t::payload_t>
+read_payload_impl(char ** const pfirst, char *last) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
     assert(last != nullptr);
-    assert(first <= last);
-    assert(v != nullptr);
+    assert(*pfirst <= last);
+    using payload_t = mcberepair::nbt_t::payload_t;
+
+    //std::cerr << "read_payload_impl\n";
+
+    char *p = *pfirst;
+    if(last-p < sizeof(T)) {
+        return {};
+    }
+    T value;
+    memcpy(&value, p, sizeof(value));
+
+    *pfirst += sizeof(T);
+
+    return {value};
+}
+
+template<typename T>
+inline
+std::enable_if_t<std::is_member_pointer_v<decltype(&T::data)> &&
+    std::is_member_pointer_v<decltype(&T::size)>, mcberepair::nbt_t::payload_t>
+read_payload_impl(char ** const pfirst, char *last) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
+    assert(last != nullptr);
+    assert(*pfirst <= last);
+    using payload_t = mcberepair::nbt_t::payload_t;
+
+    //std::cerr << "read_payload_impl_array\n";
+
+    char *p = *pfirst;
 
     using array_size_t = decltype(T::size);
 
-    if(last-first < sizeof(array_size_t)) {
-        return nullptr;
+    if(last-p < sizeof(array_size_t)) {
+        return {};
     }
     array_size_t array_size;
-    memcpy(&array_size, first, sizeof(array_size_t));
-    first += sizeof(int32_t);
-    if(last-first < sizeof(std::remove_pointer_t<decltype(T::data)>)*array_size) {
-        return nullptr;
+    memcpy(&array_size, p, sizeof(array_size_t));
+    p += sizeof(array_size_t);
+    size_t len = sizeof(std::remove_pointer_t<decltype(T::data)>)*array_size;
+    if(last-p < len) {
+        return {};
     }
-    v->emplace_back(name, T{array_size, reinterpret_cast<decltype(T::data)>(first)});
-
-    return first + sizeof(T)*array_size;
+    *pfirst = p + len;
+    return T{array_size, reinterpret_cast<decltype(T::data)>(p)};
 }
 
 inline
-char* read_list_payload(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
-    assert(first != nullptr);
+void
+read_simple_payload(char ** const pfirst, char *last, mcberepair::nbt_type type,
+    std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+    using nbt_type = mcberepair::nbt_type;
+    mcberepair::nbt_t::payload_t payload;
+
+    //std::cerr << "read_simple_payload\n";
+    
+    char *p = *pfirst;
+    switch(type) {
+    case nbt_type::BYTE:
+        payload = read_payload_impl<int8_t>(pfirst, last);
+        break;
+    case nbt_type::SHORT:
+        payload = read_payload_impl<int16_t>(pfirst, last);
+        break;
+    case nbt_type::INT:
+        payload = read_payload_impl<int32_t>(pfirst, last);
+        break;
+    case nbt_type::LONG:
+        payload = read_payload_impl<int64_t>(pfirst, last);
+        break;
+    case nbt_type::FLOAT:
+        payload = read_payload_impl<float>(pfirst, last);
+        break;
+    case nbt_type::DOUBLE:
+        payload = read_payload_impl<double>(pfirst, last);
+        break;
+    case nbt_type::BYTE_ARRAY:
+        payload = read_payload_impl<mcberepair::nbt_byte_array_t>(pfirst, last);
+        break;
+    case nbt_type::STRING:
+        payload = read_payload_impl<mcberepair::nbt_string_t>(pfirst, last);
+        break;
+    case nbt_type::INT_ARRAY:
+        payload = read_payload_impl<mcberepair::nbt_int_array_t>(pfirst, last);
+        break;
+    case nbt_type::LONG_ARRAY:
+        payload = read_payload_impl<mcberepair::nbt_long_array_t>(pfirst, last);
+        break;
+    default:
+        return;
+    }
+    if(*pfirst != p) {
+        v->emplace_back(name, payload);
+    }
+}
+
+
+inline
+void read_list_payload(char ** const pfirst, char *last, mcberepair::nbt_type type,
+    std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
     assert(last != nullptr);
-    assert(first <= last);
+    assert(*pfirst <= last);
     assert(v != nullptr);
+
+    //std::cerr << "read_list_payload\n";
 
     using nbt_type = mcberepair::nbt_type;
     using nbt_t = mcberepair::nbt_t;
     using payload_t = mcberepair::nbt_t::payload_t;
 
-    if(last-first < sizeof(int8_t)) {
-        return nullptr;
-    }
-    int8_t list_type;
-    memcpy(&list_type, first, sizeof(int8_t));
+    char *first = *pfirst;
+    char *p = first;
 
-    first += sizeof(int8_t);
-
-    if(last-first < sizeof(int32_t)) {
-        return nullptr;
+    auto list_type = read_type(&p, last);
+    if(list_type == nbt_type::END) {
+        return; // Malformed
     }
+
     int32_t list_size;
-    memcpy(&list_size, first, sizeof(int32_t));
-
-    first += sizeof(int32_t);
+    if(last-p < sizeof(list_size)) {
+        return; // Malformed
+    }
+    memcpy(&list_size, p, sizeof(list_size));
+    p += sizeof(list_size);
 
     v->emplace_back(name, mcberepair::nbt_list_t{list_size, list_type});
-    for(int i=0;i<list_size && first != nullptr;++i) {
-        first = read_payload(first, last, {}, v, mcberepair::nbt_type{list_type});
+    for(int i=0;i<list_size;++i) {
+        first = p;
+        read_nbt_impl(&p, last, list_type, {}, v);
+        if(first == p) {
+            return; // Malformed
+        }
     }
-
+    *pfirst = p;
     v->emplace_back(std::string_view{}, payload_t{mcberepair::nbt_list_end_t{}});
-
-    return first;
 }
 
 inline
-char* read_compound_payload(char *first, char *last, std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+void read_compound_payload_impl(char ** const pfirst, char *last,
+    std::vector<mcberepair::nbt_t> *v) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
+    assert(last != nullptr);
+    assert(*pfirst <= last);
+    assert(v != nullptr);
+
+    //std::cerr << "read_compound_payload_impl\n";
+
+    using nbt_type = mcberepair::nbt_type;
+
+    char *first = *pfirst;
+    while(first < last) {
+        char *p = first;
+        nbt_type type = read_type(&p, last);
+        if(type == nbt_type::END) {
+            *pfirst = p;
+            return;
+        }
+        first = p;
+        auto name = read_name(&p, last);
+        if(p == first) {
+            break;
+        }
+        first = p;
+
+        read_nbt_impl(&p, last, type, name, v);
+        if(p == first) {
+            break;
+        }
+        first = p;
+    }
+}
+
+inline
+void read_compound_payload(char ** const pfirst, char *last, mcberepair::nbt_type type,
+    std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+    assert(pfirst != nullptr && *pfirst != nullptr);
+    assert(last != nullptr);
+    assert(*pfirst <= last);
+    assert(v != nullptr);
+
+    //std::cerr << "read_compound_payload\n";
+
     using nbt_type = mcberepair::nbt_type;
 
     v->emplace_back(name, mcberepair::nbt_compound_t{});
 
-    char *p = first;
-    while(p < last && p != nullptr) {
-        nbt_type type = nbt_type{*p};
-        p += 1;
-        if(type == nbt_type::END) {
-            v->emplace_back(std::string_view{}, mcberepair::nbt_end_t{});
-            return p;
-        }
-        std::string_view child_name;
-        p = read_name(p, last, &child_name);
-        if(p == nullptr) {
-            break;
-        }
-        p = read_payload(p, last, child_name, v, type);
+    char *first = *pfirst;
+    read_compound_payload_impl(pfirst, last, v);
+    if(first == *pfirst) {
+        return; // malformed
     }
-    // data ended without finding an end tag
-    return nullptr;
+    v->emplace_back(std::string_view{}, mcberepair::nbt_end_t{});
 }
 
-inline
-char* read_simple_payload(char *p, char *last, std::string_view name,
-    std::vector<mcberepair::nbt_t> *v, mcberepair::nbt_type type) {
-    using nbt_type = mcberepair::nbt_type;
-    switch(type) {
-    case nbt_type::BYTE:
-        p = read_payload_impl<int8_t>(p, last, name, v);
-        break;
-    case nbt_type::SHORT:
-        p = read_payload_impl<int16_t>(p, last, name, v);
-        break;
-    case nbt_type::INT:
-        p = read_payload_impl<int32_t>(p, last, name, v);
-        break;
-    case nbt_type::LONG:
-        p = read_payload_impl<int64_t>(p, last, name, v);
-        break;
-    case nbt_type::FLOAT:
-        p = read_payload_impl<float>(p, last, name, v);
-        break;
-    case nbt_type::DOUBLE:
-        p = read_payload_impl<double>(p, last, name, v);
-        break;
-    case nbt_type::BYTE_ARRAY:
-        p = read_payload_impl<mcberepair::nbt_byte_array_t>(p, last, name, v);
-        break;
-    case nbt_type::STRING:
-        p = read_payload_impl<mcberepair::nbt_string_t>(p, last, name, v);
-        break;
-    case nbt_type::INT_ARRAY:
-        p = read_payload_impl<mcberepair::nbt_int_array_t>(p, last, name, v);
-        break;
-    case nbt_type::LONG_ARRAY:
-        p = read_payload_impl<mcberepair::nbt_long_array_t>(p, last, name, v);
-        break;
-    default:
-        return nullptr;
-    }
-    return p;
-}
 
 inline
-char* read_payload(char *p, char *last, std::string_view name,
-    std::vector<mcberepair::nbt_t> *v, mcberepair::nbt_type type) {
+void read_nbt_impl(char ** const pfirst, char *last, mcberepair::nbt_type type,
+    std::string_view name, std::vector<mcberepair::nbt_t> *v) {
+
+    //std::cerr << "read_nbt_impl\n";
 
     using nbt_type = mcberepair::nbt_type;
 
@@ -216,48 +301,39 @@ char* read_payload(char *p, char *last, std::string_view name,
         case nbt_type::STRING:
         case nbt_type::INT_ARRAY:
         case nbt_type::LONG_ARRAY:
-            return read_simple_payload(p, last, name, v, type);
+            read_simple_payload(pfirst, last, type, name, v);
+            break;
         case nbt_type::LIST:
-            return read_list_payload(p, last, name, v);
+            read_list_payload(pfirst, last, type, name, v);
+            break;
         case nbt_type::COMPOUND:
-            return read_compound_payload(p, last, name, v);
+            read_compound_payload(pfirst, last, type, name, v);
+            break;
         case nbt_type::END:
         default:
             //malformed
+            assert(false);
             break;
     }
-    return nullptr;
 }
 
-bool read_nbt(char *first, char *last, std::vector<mcberepair::nbt_t> *nbt_data) {
+bool read_nbt(char *first, size_t length, std::vector<mcberepair::nbt_t> *nbt_data) {
     assert(first != nullptr);
-    assert(last != nullptr);
-    assert(first <= last);
     assert(nbt_data != nullptr);
+
+    //std::cerr << "read_nbt\n";
 
     using nbt_type = mcberepair::nbt_type;
 
-
-    if(first == last) {
+    if(length == 0) {
         return true;
     }
 
-    char *p = first;
-    while(p < last && p != nullptr) {
-        nbt_type type = nbt_type{*p};
-        p += 1;
+    char * last = first+length;
 
-        std::string_view child_name;
-        p = read_name(p, last, &child_name);
+    read_compound_payload_impl(&first, last, nbt_data);
 
-        //std::cerr << (int)type << " " << child_name << "\n";
-
-        if(p == nullptr) {
-            return false;
-        }
-        p = read_payload(p, last, child_name, nbt_data, type);
-    }
-    return (p != nullptr);
+    return (first == last);
 }
 
 const char data[] = "\x09\x0b\0Hello World\x08\x02\0\0\0\x0b\0Hello World\x0b\0Hello_World";
@@ -267,16 +343,14 @@ const char data[] = "\x09\x0b\0Hello World\x08\x02\0\0\0\x0b\0Hello World\x0b\0H
 int main(int argc, char *argv[]) {
     //std::string buffer(&data[0], sizeof(data));
 
-
     std::string buffer = mcberepair::slurp_string(std::cin);
 
-
     std::vector<mcberepair::nbt_t> result;
-    bool res = read_nbt(buffer.data(),buffer.data()+buffer.size(), &result);
+    bool res = read_nbt(buffer.data(),buffer.size(), &result);
 
-    std::cout << result.size() << "\n";
+    //std::cout << result.size() << "\n";
     for(auto &&a : result) {
-        std::cout << a.name << "\n";
+        std::cout << a.name << " "  << a.payload.index() << "\n";
     }
     
     return res ? EXIT_SUCCESS : EXIT_FAILURE;
