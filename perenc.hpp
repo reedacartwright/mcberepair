@@ -24,19 +24,24 @@
 
 #include <cassert>
 #include <string>
+#include <string_view>
 #include <algorithm>
 
-std::string percent_encode(const std::string &str);
+namespace mcberepair {
+
+std::string percent_encode(std::string_view str);
 void percent_decode(std::string *str);
 
 inline
-std::string percent_encode(const std::string &str) {
-    auto is_graph = [](unsigned char c) { return std::isgraph(c); };
+std::string percent_encode(std::string_view str) {
+    auto is_notgraph = [](unsigned char c) {
+        return std::isgraph(c) == 0 || c == '%' || c == '@';
+    };
 
     // optimize for situation in which no encoding is needed
-    auto it = std::find(str.begin(), str.end(), is_graph);
+    auto it = std::find_if(str.begin(), str.end(), is_notgraph);
     if(it == str.end()) {
-        return str;
+        return std::string{str};
     }
     char buffer[8];
     // setup return value
@@ -45,12 +50,13 @@ std::string percent_encode(const std::string &str) {
     auto bit = str.begin();
     do {
         // Append sequences and encoded character
-        std::snprintf(buffer, 8, "%%%02X", *it);
+        unsigned char c = *it;
+        std::snprintf(buffer, 8, "%%%02hhX", c);
         ret.append(bit, it);
         ret.append(buffer);
         // Find next character to encode
         bit = ++it;
-        it = std::find(it, str.end(), is_graph);
+        it = std::find_if(it, str.end(), is_notgraph);
     } while( it != str.end());
     // Append tail
     ret.append(bit, str.end());
@@ -109,6 +115,8 @@ inline void percent_decode(std::string *str) {
     if(pos != std::string::npos) {
         percent_decode_core(str, pos);
     }
+}
+
 }
 
 #endif // MCBEREPAIR_PERCENC_HPP

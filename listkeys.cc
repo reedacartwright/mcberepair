@@ -57,17 +57,16 @@ int main(int argc, char* argv[]) {
     auto it = std::unique_ptr<leveldb::Iterator>{db().NewIterator(readOptions)};
 
     for(it->SeekToFirst(); it->Valid(); it->Next()) {
-        auto k = it->key();
+        auto key = it->key();
         // print an encoded key
-        std::string key = mcberepair::encode_key(k.data(), k.size());
-        printf("%s", key.c_str());
+        std::string enckey = mcberepair::encode_key({key.data(),key.size()});
+        printf("%s", enckey.c_str());
         printf("\t%lu", it->value().size());
 
         // Identify keys that might represent chunks
-        // See https://minecraft.gamepedia.com/Bedrock_Edition_level_format
-        if(mcberepair::is_chunk_key(k)) {
+        if(mcberepair::is_chunk_key({key.data(),key.size()})) {
             // read chunk key
-            auto chunk = mcberepair::parse_chunk_key(k);
+            auto chunk = mcberepair::parse_chunk_key({key.data(),key.size()});
             // print chunk information
             printf("\t%d\t%d\t%d\t%d\t", chunk.dimension, chunk.x, chunk.z, chunk.tag);
             if(chunk.subtag != -1) {

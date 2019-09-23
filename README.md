@@ -9,9 +9,9 @@ Editing your save games can be really dangerous and have unexpected results.
 
 `listkeys` lists all the keys in a world's leveldb database. Output is a tab-separated file
 with seven columns and a header.
-Keys are [base64url encoded](https://en.wikipedia.org/wiki/Base64)
-and placed in column 1. Keys that can be represented in plain text are prefixed with `plain:`
-to distinguish them from the encoded keys. 
+Plain text keys are [percent encoded](https://en.wikipedia.org/wiki/Percent-encoding) and placed in column 1.
+Keys that represent chunk data being with `@` and are in the format
+`@dimension:x:z:tag` or `@dimension:x:z:tag-subtag`
 Column 2 holds the size of the data held by `key` in bytes.
 If `key` looks like it represents a chunk, the chunk information will be parsed
 and placed in columns 3--7.
@@ -19,22 +19,23 @@ and placed in columns 3--7.
 ### Example Output
 
 ```
-key	bytes	x	z	dimension	tag	subchunk
-cAEAACMAAAAvAA==	2547	368	35	0	47	0
-cAEAACMAAAAvAQ==	4312	368	35	0	47	1
-cAEAACMAAAAvAg==	4013	368	35	0	47	2
-cAEAACMAAAAvAw==	589	368	35	0	47	3
-cAEAACMAAAA2	4	368	35	0	54	
-cAEAACMAAAB2	1	368	35	0	118	
-plain:portals	2301					
-cP___wH___8t	768	-144	-255	0	45	
-cP___wH___8vAA==	4014	-144	-255	0	47	0
-cP___wH___8vAQ==	2429	-144	-255	0	47	1
-cP___wH___8vAg==	3129	-144	-255	0	47	2
-cP___wH___8vAw==	2500	-144	-255	0	47	3
-cP___wH___8y	1658	-144	-255	0	50	
-cP___wH___82	4	-144	-255	0	54	
-cP___wH___92	1	-144	-255	0	118	
+key	bytes	dimension x	z	tag	subchunk
+@0:368:35:45    768 0   368 35  45  
+@0:368:35:47-0  2547    0   368 35  47  0
+@0:368:35:47-1  4312    0   368 35  47  1
+@0:368:35:47-2  4013    0   368 35  47  2
+@0:368:35:47-3  589 0   368 35  47  3
+@0:368:35:54    4   0   368 35  54  
+@0:368:35:118   1   0   368 35  118 
+portals 2301                    
+@0:-144:-255:45 768 0   -144    -255    45  
+@0:-144:-255:47-0   4014    0   -144    -255    47  0
+@0:-144:-255:47-1   2429    0   -144    -255    47  1
+@0:-144:-255:47-2   3129    0   -144    -255    47  2
+@0:-144:-255:47-3   2500    0   -144    -255    47  3
+@0:-144:-255:50 1658    0   -144    -255    50  
+@0:-144:-255:54 4   0   -144    -255    54  
+@0:-144:-255:118    1   0   -144    -255    118 
 ```
 
 ## rmkeys
@@ -45,18 +46,17 @@ Input is a list of keys, one per line.
 ### Example Input
 
 ```
-plain:Nether
-plain:portals
-AAAAANj___8BAAAALQ==
-AAAAANj___8BAAAALwA=
-AAAAANj___8BAAAALwE=
-AAAAANj___8BAAAALwI=
-AAAAANj___8BAAAALwc=
-AAAAANj___8BAAAAMg==
-AAAAANj___8BAAAANg==
-AAAAANj___8BAAAAdg==
-AAAAANn___8BAAAALQ==
-AAAAANn___8BAAAALwA=
+Nether
+portals
+@2:0:0:45
+@2:0:0:47-0
+@2:0:0:47-1
+@2:0:0:47-2
+@2:0:0:47-3
+@2:0:0:47-4
+@2:0:0:49
+@2:0:0:54
+@2:0:0:118
 ```
 
 ## dumpkey
@@ -80,8 +80,8 @@ listkeys t5BPXQwUAQA= > list.tsv
 gawk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
 
 rmkeys t5BPXQwUAQA= < netherkeys.txt
-echo portals|rmkeys t5BPXQwUAQA=
-echo Nether|rmkeys t5BPXQwUAQA=
+echo portals | rmkeys t5BPXQwUAQA=
+echo Nether | rmkeys t5BPXQwUAQA=
 ```
 
 ### Reset the End
@@ -91,7 +91,7 @@ listkeys t5BPXQwUAQA= > list.tsv
 gawk '$3 == 2 {print $1}' list.tsv > endkeys.txt
 
 rmkeys t5BPXQwUAQA= < endkeys.txt
-echo TheEnd|rmkeys "t5BPXQwUAQA="
+echo TheEnd | rmkeys t5BPXQwUAQA=
 ```
 
 ### Reset Overworld chunks that are greater than 100 chunks from 0,0
@@ -106,8 +106,8 @@ rmkeys t5BPXQwUAQA= < farkeys.txt
 ### Copy the data from one key to another
 
 ```
-dumpkey t5BPXQwUAQA= AAAAANj___8BAAAALwA= > subchunk.bin
-writekey t5BPXQwUAQA= AAAAANj___8BAAAALwE= < subchunk.bin
+dumpkey t5BPXQwUAQA= '@2:0:0:47-0' > subchunk.bin
+writekey t5BPXQwUAQA= '@2:0:0:47-0' < subchunk.bin
 ```
 
 ### Print keys that don't belong to a chunk
