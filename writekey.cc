@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    std::string key = decode_key(argv[2]);
+    std::string key = mcberepair::decode_key(argv[2]);
 
     leveldb::Status status = db().Put({}, key, value);
 

@@ -76,45 +76,45 @@ and generate the input to rmkeys.
 ### Reset the Nether
 
 ```
-listkeys "t5BPXQwUAQA=" > list.tsv
-gawk "$5 == 1 {print $1}" list.tsv > netherkeys.txt
+listkeys t5BPXQwUAQA= > list.tsv
+gawk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
 
-rmkeys "t5BPXQwUAQA=" < netherkeys.txt
-echo portals|rmkeys "t5BPXQwUAQA="
-echo Nether|rmkeys "t5BPXQwUAQA="
+rmkeys t5BPXQwUAQA= < netherkeys.txt
+echo portals|rmkeys t5BPXQwUAQA=
+echo Nether|rmkeys t5BPXQwUAQA=
 ```
 
 ### Reset the End
 
 ```
-listkeys "t5BPXQwUAQA=" > list.tsv
-gawk "$5 == 2 {print $1}" list.tsv > endkeys.txt
+listkeys t5BPXQwUAQA= > list.tsv
+gawk '$3 == 2 {print $1}' list.tsv > endkeys.txt
 
-rmkeys "t5BPXQwUAQA=" < endkeys.txt
+rmkeys t5BPXQwUAQA= < endkeys.txt
 echo TheEnd|rmkeys "t5BPXQwUAQA="
 ```
 
 ### Reset Overworld chunks that are greater than 100 chunks from 0,0
 
 ```
-listkeys "t5BPXQwUAQA=" > list.tsv
-gawk "sqrt($3^2+$4^2) > 100 && $5 == 0 {print $1}" list.tsv > farkeys.txt
+listkeys t5BPXQwUAQA= > list.tsv
+gawk '$3 == 0 && sqrt($4^2+$5^2) > 100 {print $1}' list.tsv > farkeys.txt
 
-rmkeys "t5BPXQwUAQA=" < farkeys.txt
+rmkeys t5BPXQwUAQA= < farkeys.txt
 ```
 
 ### Copy the data from one key to another
 
 ```
-dumpkey "t5BPXQwUAQA=" "AAAAANj___8BAAAALwA=" > subchunk.bin
-writekey "t5BPXQwUAQA=" "AAAAANj___8BAAAALwE=" < subchunk.bin
+dumpkey t5BPXQwUAQA= AAAAANj___8BAAAALwA= > subchunk.bin
+writekey t5BPXQwUAQA= AAAAANj___8BAAAALwE= < subchunk.bin
 ```
 
 ### Print keys that don't belong to a chunk
 
 ```
-listkeys "t5BPXQwUAQA=" > list.tsv
-gawk "$3 == \"\"" list.tsv
+listkeys t5BPXQwUAQA= > list.tsv
+gawk '$3 == ""' list.tsv
 ```
 
 ## References

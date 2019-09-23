@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     std::string line;
     while(std::getline(std::cin, line)) {
         printf("Deleting key '%s'...\n", line.c_str());
-        status = db().Delete({}, decode_key(line));
+        status = db().Delete({}, mcberepair::decode_key(line));
         if(!status.ok()) {
             fprintf(stderr, "ERROR: Writing '%s' failed: %s\n", path.c_str(),
                     status.ToString().c_str());

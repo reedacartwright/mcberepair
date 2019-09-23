@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Print header
-    printf("key\tbytes\tx\tz\tdimension\ttag\tsubchunk\n");
+    printf("key\tbytes\tdimension\tx\tz\ttag\tsubtag\n");
 
     // create a reusable memory space for decompression so it allocates less
     leveldb::ReadOptions readOptions;
@@ -59,40 +59,19 @@ int main(int argc, char* argv[]) {
     for(it->SeekToFirst(); it->Valid(); it->Next()) {
         auto k = it->key();
         // print an encoded key
-        std::string key = encode_key(k.data(), k.size());
+        std::string key = mcberepair::encode_key(k.data(), k.size());
         printf("%s", key.c_str());
         printf("\t%lu", it->value().size());
 
         // Identify keys that might represent chunks
         // See https://minecraft.gamepedia.com/Bedrock_Edition_level_format
-        if(k.size() == 9 || k.size() == 10 || k.size() == 13 ||
-           k.size() == 14) {
-            // read x and z coordinates
-            int x,z;
-            memcpy(&x, k.data()+0, 4);
-            memcpy(&z, k.data()+4, 4);
-            // read the dimension coordinate
-            int d = 0;
-            if(k.size() >= 13) {
-                memcpy(&d, k.data()+8, 4);
-            }
-            // read the tag
-            int tag = (k.size() >= 13) ? k[12] : k[8];
-            // read the subchunk
-            int subchunk = -1;
-            if(k.size() == 10) {
-                subchunk = k[9];
-            } else if(k.size() == 14) {
-                subchunk = k[13];
-            }
-            // Print information if tag is valid
-            if((45 <= tag && tag <= 58) || tag == 118) {
-                printf("\t%d\t%d\t%d\t%d\t", x, z, d, tag);
-                if(subchunk != -1) {
-                    printf("%d", subchunk);
-                }
-            } else {
-                printf("\t\t\t\t\t");
+        if(mcberepair::is_chunk_key(k)) {
+            // read chunk key
+            auto chunk = mcberepair::parse_chunk_key(k);
+            // print chunk information
+            printf("\t%d\t%d\t%d\t%d\t", chunk.dimension, chunk.x, chunk.z, chunk.tag);
+            if(chunk.subtag != -1) {
+                printf("%d", chunk.subtag);
             }
         } else {
             printf("\t\t\t\t\t");
