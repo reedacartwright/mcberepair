@@ -31,7 +31,8 @@
 
 int main(int argc, char *argv[]) {
     if(argc < 2) {
-        printf("Usage: %s <minecraft_world_dir> < list.txt\n", argv[0]);
+        printf("Usage: %s <minecraft_world_dir> < keys.txt\n", argv[0]);
+        printf("       %s <minecraft_world_dir> <key> <key>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -48,13 +49,32 @@ int main(int argc, char *argv[]) {
 
     leveldb::Status status;
 
-    std::string line;
-    while(std::getline(std::cin, line)) {
+    // Create a function that deletes the key.
+    auto delete_key = [&](const std::string &line) -> bool {
         printf("Deleting key '%s'...\n", line.c_str());
         status = db().Delete({}, mcberepair::decode_key(line));
         if(!status.ok()) {
             fprintf(stderr, "ERROR: Writing '%s' failed: %s\n", path.c_str(),
                     status.ToString().c_str());
+            return false;
+        }
+        return true;
+    };
+
+    // handle keys passed as arguments
+    if(argc > 2) {
+        for(int i=2;i<argc;++i) {
+            if(!delete_key(argv[i])) {
+                return EXIT_FAILURE;
+            }
+        }
+        return EXIT_SUCCESS;
+    }
+
+    // Or handle keys passed on stdin.
+    std::string line;
+    while(std::getline(std::cin, line)) {
+        if(!delete_key(line)) {
             return EXIT_FAILURE;
         }
     }
