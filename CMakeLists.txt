@@ -23,4 +23,7 @@ target_link_libraries(dumpkey LEVELDB_MCPE::LEVELDB_MCPE)
 add_executable(writekey writekey.cc base64.cpp)
 target_link_libraries(writekey LEVELDB_MCPE::LEVELDB_MCPE)
 
+
+add_executable(blockposhash blockposhash.cc)
+
 configure_file(mcberepair.sublime-project.in mcberepair.sublime-project @ONLY)

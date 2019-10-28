@@ -69,36 +69,36 @@ Puts a value into the database. Reads binary data from stdin.
 
 ## Examples
 
-This example runs in a Windows Command Prompt, and uses `gawk` to filter the output of listkeys
-and generate the input to rmkeys.
-`t5BPXQwUAQA=` is the path to the minecraft world folder that is being edited.
+These examples run in a bash command prompt, and can be modified to run in a windows
+command prompt.
+Some use `awk` to filter the output of `listkeys`.
+Replace `t5BPXQwUAQA=` with a path to the minecraft world folder that is being edited.
 
-### Reset the Nether
+### Reset the Nether and Portals
 
 ```
 listkeys t5BPXQwUAQA= > list.tsv
-gawk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
+awk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
 
 rmkeys t5BPXQwUAQA= < netherkeys.txt
-echo portals | rmkeys t5BPXQwUAQA=
-echo Nether | rmkeys t5BPXQwUAQA=
+rmkeys t5BPXQwUAQA= portals Nether
 ```
 
 ### Reset the End
 
 ```
 listkeys t5BPXQwUAQA= > list.tsv
-gawk '$3 == 2 {print $1}' list.tsv > endkeys.txt
+awk '$3 == 2 {print $1}' list.tsv > endkeys.txt
 
 rmkeys t5BPXQwUAQA= < endkeys.txt
-echo TheEnd | rmkeys t5BPXQwUAQA=
+rmkeys t5BPXQwUAQA= TheEnd
 ```
 
 ### Reset Overworld chunks that are greater than 100 chunks from 0,0
 
 ```
 listkeys t5BPXQwUAQA= > list.tsv
-gawk '$3 == 0 && sqrt($4^2+$5^2) > 100 {print $1}' list.tsv > farkeys.txt
+awk '$3 == 0 && sqrt($4^2+$5^2) > 100 {print $1}' list.tsv > farkeys.txt
 
 rmkeys t5BPXQwUAQA= < farkeys.txt
 ```
@@ -107,14 +107,14 @@ rmkeys t5BPXQwUAQA= < farkeys.txt
 
 ```
 dumpkey t5BPXQwUAQA= '@2:0:0:47-0' > subchunk.bin
-writekey t5BPXQwUAQA= '@2:0:0:47-0' < subchunk.bin
+writekey t5BPXQwUAQA= '@2:0:1:47-0' < subchunk.bin
 ```
 
-### Print keys that don't belong to a chunk
+### Print keys that don't belong to any chunk
 
 ```
 listkeys t5BPXQwUAQA= > list.tsv
-gawk '$3 == ""' list.tsv
+awk '$3 == ""' list.tsv
 ```
 
 ## References
