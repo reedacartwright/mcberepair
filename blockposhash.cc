@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         str >> x;
         str >> y;
         str >> z;
-        printf("%d\t%d\t%d\t%ld",x,y,z,hash_blockpos(x,y,z));
+        printf("%d\t%d\t%d\t%lu",x,y,z,hash_blockpos(x,y,z));
     }
     return EXIT_SUCCESS;
 }
