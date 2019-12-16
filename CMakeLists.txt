@@ -11,6 +11,18 @@ project(mcberepair VERSION 0.1 LANGUAGES CXX)
 
 find_package(LEVELDB_MCPE)
 
+# GOOGLE disables RTTI for leveldb so we will do the same
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # Disable RTTI.
+  string(REGEX REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+else()
+  # Disable RTTI.
+  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+endif()
+
+
 add_executable(listkeys listkeys.cc base64.cpp)
 target_link_libraries(listkeys LEVELDB_MCPE::LEVELDB_MCPE)
 
