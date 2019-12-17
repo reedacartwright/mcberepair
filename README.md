@@ -117,6 +117,14 @@ listkeys t5BPXQwUAQA= > list.tsv
 awk '$3 == ""' list.tsv
 ```
 
+### Delete all pending ticks records above 4096 bytes in size.
+
+```
+listkeys t5BPXQwUAQA= > list.tsv
+awk '$6 == 51 && $2 > 4096 {print $1}' list.tsv > pending_ticks.tsv
+rmkeys t5BPXQwUAQA= < pending_ticks.tsv
+```
+
 ## References
 
  - https://github.com/Mojang/leveldb-mcpe
