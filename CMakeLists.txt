@@ -23,19 +23,19 @@ else()
 endif()
 
 
-add_executable(listkeys listkeys.cc base64.cpp)
+add_executable(listkeys listkeys.cc)
 target_link_libraries(listkeys LEVELDB_MCPE::LEVELDB_MCPE)
 
-add_executable(rmkeys rmkeys.cc base64.cpp)
+add_executable(rmkeys rmkeys.cc)
 target_link_libraries(rmkeys LEVELDB_MCPE::LEVELDB_MCPE)
 
-add_executable(dumpkey dumpkey.cc base64.cpp)
+add_executable(dumpkey dumpkey.cc)
 target_link_libraries(dumpkey LEVELDB_MCPE::LEVELDB_MCPE)
 
-add_executable(writekey writekey.cc base64.cpp)
+add_executable(writekey writekey.cc)
 target_link_libraries(writekey LEVELDB_MCPE::LEVELDB_MCPE)
 
-
-add_executable(blockposhash blockposhash.cc)
+add_executable(repair repair.cc)
+target_link_libraries(repair LEVELDB_MCPE::LEVELDB_MCPE)
 
 configure_file(mcberepair.sublime-project.in mcberepair.sublime-project @ONLY)
