@@ -38,4 +38,8 @@ target_link_libraries(writekey LEVELDB_MCPE::LEVELDB_MCPE)
 add_executable(repair repair.cc)
 target_link_libraries(repair LEVELDB_MCPE::LEVELDB_MCPE)
 
+add_executable(copy copy.cc)
+target_link_libraries(copy LEVELDB_MCPE::LEVELDB_MCPE)
+
+
 configure_file(mcberepair.sublime-project.in mcberepair.sublime-project @ONLY)

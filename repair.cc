@@ -38,14 +38,6 @@ int main(int argc, char *argv[]) {
     // construct path for Minecraft BE database
     std::string path = std::string(argv[1]) + "/db";
 
-    // open the database
-    mcberepair::DB db{path.c_str()};
-
-    if(!db) {
-        fprintf(stderr, "ERROR: Opening '%s' failed.\n", path.c_str());
-        return EXIT_FAILURE;
-    }
-
     leveldb::ZlibCompressorRaw zlib_raw;
     leveldb::ZlibCompressor zlib;
 

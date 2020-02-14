@@ -38,7 +38,7 @@ class NullLogger : public leveldb::Logger {
 
 class DB {
 public:
-    DB(const char* path) : options_{},
+    DB(const char* path, bool create_if_missing=false, bool error_if_exists=false) : options_{},
         filter_policy_{leveldb::NewBloomFilterPolicy(10)},
         block_cache_{leveldb::NewLRUCache(40 * 1024 * 1024)},
         info_log{}, zlib_raw_{}, zlib_{},
@@ -57,6 +57,9 @@ public:
         // also setup the old, slower compressor for backwards compatibility. This
         // will only be used to read old compressed blocks.
         options_.compressors[1] = &zlib_;
+
+        options_.create_if_missing = create_if_missing;
+        options_.error_if_exists = error_if_exists;
 
         leveldb::DB* pdb = nullptr;
         leveldb::Status status = leveldb::DB::Open(options_, path, &pdb);
