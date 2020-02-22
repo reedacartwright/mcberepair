@@ -30,7 +30,7 @@
 #include "mcbekey.hpp"
 
 int main(int argc, char *argv[]) {
-    if(argc < 2) {
+    if(argc < 3) {
         printf("Usage: %s <source_minecraft_world_dir> <dest_minecraft_world_dir>\n", argv[0]);
         return EXIT_FAILURE;
     }
