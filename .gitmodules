@@ -1,0 +1,3 @@
+[submodule "leveldb-mcpe"]
+	path = leveldb-mcpe
+	url = ../leveldb-mcpe.git
