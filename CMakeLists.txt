@@ -9,7 +9,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
 
 project(mcberepair VERSION 0.1 LANGUAGES CXX)
 
-find_package(LEVELDB_MCPE)
+option(LEVELDB_BUILD_TESTS OFF)
+add_subdirectory(leveldb-mcpe)
 
 # GOOGLE disables RTTI for leveldb so we will do the same
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -22,24 +23,9 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
-
-add_executable(listkeys listkeys.cc)
-target_link_libraries(listkeys LEVELDB_MCPE::LEVELDB_MCPE)
-
-add_executable(rmkeys rmkeys.cc)
-target_link_libraries(rmkeys LEVELDB_MCPE::LEVELDB_MCPE)
-
-add_executable(dumpkey dumpkey.cc)
-target_link_libraries(dumpkey LEVELDB_MCPE::LEVELDB_MCPE)
-
-add_executable(writekey writekey.cc)
-target_link_libraries(writekey LEVELDB_MCPE::LEVELDB_MCPE)
-
-add_executable(repair repair.cc)
-target_link_libraries(repair LEVELDB_MCPE::LEVELDB_MCPE)
-
-add_executable(copy copy.cc)
-target_link_libraries(copy LEVELDB_MCPE::LEVELDB_MCPE)
-
+foreach(NAME listkeys rmkeys dumpkey writekey repair copy)
+	add_executable(${NAME} ${NAME}.cc)
+	target_link_libraries(${NAME} leveldb)
+endforeach()
 
 configure_file(mcberepair.sublime-project.in mcberepair.sublime-project @ONLY)
