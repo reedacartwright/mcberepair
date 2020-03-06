@@ -110,9 +110,9 @@ inline std::string encode_key(std::string_view key) {
     }
     auto chunk = parse_chunk_key(key);
     std::stringstream str;
-    str << "@" << chunk.dimension
-        << ":" << chunk.x
+    str << "@" << chunk.x
         << ":" << chunk.z
+        << ":" << chunk.dimension
         << ":" << static_cast<unsigned int>(chunk.tag);
 
     if(chunk.subtag != -1) {
@@ -131,12 +131,6 @@ inline std::string decode_key(std::string_view key) {
     std::string buf{key.substr(1)};
     std::stringstream str(buf);
     chunk_t chunk;
-    if(!(str >> chunk.dimension)) {
-        return {};
-    }
-    if(str.peek() == ':') {
-        str.ignore();
-    }
     if(!(str >> chunk.x)) {
         return {};
     }
@@ -145,6 +139,12 @@ inline std::string decode_key(std::string_view key) {
     }
     if(!(str >> chunk.z)) {
         return {};
+    }
+    if(!(str >> chunk.dimension)) {
+        return {};
+    }
+    if(str.peek() == ':') {
+        str.ignore();
     }
     unsigned int tag;
     if(str.peek() == ':') {

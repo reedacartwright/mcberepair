@@ -11,7 +11,7 @@ Editing your save games can be really dangerous and have unexpected results.
 with seven columns and a header.
 Plain text keys are [percent encoded](https://en.wikipedia.org/wiki/Percent-encoding) and placed in column 1.
 Keys that represent chunk data being with `@` and are in the format
-`@dimension:x:z:tag` or `@dimension:x:z:tag-subtag`
+`@x:z:dimension:tag` or `@x:z:dimension:tag-subtag`
 Column 2 holds the size of the data held by `key` in bytes.
 If `key` looks like it represents a chunk, the chunk information will be parsed
 and placed in columns 3--7.
@@ -19,23 +19,25 @@ and placed in columns 3--7.
 ### Example Output
 
 ```
-key	bytes	dimension x	z	tag	subchunk
-@0:368:35:45    768 0   368 35  45  
-@0:368:35:47-0  2547    0   368 35  47  0
-@0:368:35:47-1  4312    0   368 35  47  1
-@0:368:35:47-2  4013    0   368 35  47  2
-@0:368:35:47-3  589 0   368 35  47  3
-@0:368:35:54    4   0   368 35  54  
-@0:368:35:118   1   0   368 35  118 
-portals 2301                    
-@0:-144:-255:45 768 0   -144    -255    45  
-@0:-144:-255:47-0   4014    0   -144    -255    47  0
-@0:-144:-255:47-1   2429    0   -144    -255    47  1
-@0:-144:-255:47-2   3129    0   -144    -255    47  2
-@0:-144:-255:47-3   2500    0   -144    -255    47  3
-@0:-144:-255:50 1658    0   -144    -255    50  
-@0:-144:-255:54 4   0   -144    -255    54  
-@0:-144:-255:118    1   0   -144    -255    118 
+key	bytes	x	z	dimension	tag	subtag
+@368:187:0:45	768	368	187	0	45	
+@368:187:0:47-0	2586	368	187	0	47	0
+@368:187:0:47-1	3094	368	187	0	47	1
+@368:187:0:47-2	2468	368	187	0	47	2
+@368:187:0:47-3	589	368	187	0	47	3
+@368:187:0:54	4	368	187	0	54	
+@368:187:0:118	1	368	187	0	118	
+portals	10995					
+@-144:0:2:45	768	-144	0	2	45	
+@-144:0:2:47-0	2649	-144	0	2	47	0
+@-144:0:2:47-1	2693	-144	0	2	47	1
+@-144:0:2:47-2	2649	-144	0	2	47	2
+@-144:0:2:47-3	3893	-144	0	2	47	3
+@-144:0:2:47-4	3126	-144	0	2	47	4
+@-144:0:2:51	132766	-144	0	2	51	
+@-144:0:2:54	4	-144	0	2	54	
+@-144:0:2:58	1510	-144	0	2	58	
+@-144:0:2:118	1	-144	0	2	118	
 ```
 
 ## rmkeys
@@ -48,15 +50,15 @@ Input is a list of keys, one per line.
 ```
 Nether
 portals
-@2:0:0:45
-@2:0:0:47-0
-@2:0:0:47-1
-@2:0:0:47-2
-@2:0:0:47-3
-@2:0:0:47-4
-@2:0:0:49
-@2:0:0:54
-@2:0:0:118
+@0:0:2:45
+@0:0:2:47-0
+@0:0:2:47-1
+@0:0:2:47-2
+@0:0:2:47-3
+@0:0:2:47-4
+@0:0:2:49
+@0:0:2:54
+@0:0:2:118
 ```
 
 ## dumpkey
@@ -106,8 +108,8 @@ rmkeys t5BPXQwUAQA= < farkeys.txt
 ### Copy the data from one key to another
 
 ```
-dumpkey t5BPXQwUAQA= '@2:0:0:47-0' > subchunk.bin
-writekey t5BPXQwUAQA= '@2:0:1:47-0' < subchunk.bin
+dumpkey t5BPXQwUAQA= '@0:0:2:47-0' > subchunk.bin
+writekey t5BPXQwUAQA= '@0:1:2:47-0' < subchunk.bin
 ```
 
 ### Print keys that don't belong to any chunk

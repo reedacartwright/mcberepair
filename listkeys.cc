@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Print header
-    printf("key\tbytes\tdimension\tx\tz\ttag\tsubtag\n");
+    printf("key\tbytes\tx\tz\tdimension\ttag\tsubtag\n");
 
     // create a reusable memory space for decompression so it allocates less
     leveldb::ReadOptions readOptions;
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
             // read chunk key
             auto chunk = mcberepair::parse_chunk_key({key.data(),key.size()});
             // print chunk information
-            printf("\t%d\t%d\t%d\t%d\t", chunk.dimension, chunk.x, chunk.z, chunk.tag);
+            printf("\t%d\t%d\t%d\t%d\t", chunk.x, chunk.z, chunk.dimension, chunk.tag);
             if(chunk.subtag != -1) {
                 printf("%d", chunk.subtag);
             }
