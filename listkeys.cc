@@ -27,9 +27,9 @@
 #include "db.hpp"
 #include "mcbekey.hpp"
 
-int main(int argc, char* argv[]) {
-    if(argc < 2) {
-        printf("Usage: %s <minecraft_world_dir> > list.tsv\n", argv[0]);
+int listkeys_main(int argc, char* argv[]) {
+    if(argc < 3 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s listkeys <minecraft_world_dir> > list.tsv\n", argv[0]);
         return EXIT_FAILURE;
     }
 

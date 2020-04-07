@@ -29,10 +29,10 @@
 
 #include "mcbekey.hpp"
 
-int main(int argc, char *argv[]) {
-    if(argc < 2) {
-        printf("Usage: %s <minecraft_world_dir> < keys.txt\n", argv[0]);
-        printf("       %s <minecraft_world_dir> <key> <key>\n", argv[0]);
+int rmkeys_main(int argc, char *argv[]) {
+    if(argc < 3 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s rmkeys <minecraft_world_dir> < keys.txt\n", argv[0]);
+        printf("       %s rmkeys <minecraft_world_dir> <key> <key>\n", argv[0]);
         return EXIT_FAILURE;
     }
 

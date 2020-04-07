@@ -29,9 +29,9 @@
 
 #include "mcbekey.hpp"
 
-int main(int argc, char *argv[]) {
-    if(argc < 3) {
-        printf("Usage: %s <source_minecraft_world_dir> <dest_minecraft_world_dir>\n", argv[0]);
+int copyall_main(int argc, char *argv[]) {
+    if(argc < 4 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s copyall <source_minecraft_world_dir> <dest_minecraft_world_dir>\n", argv[0]);
         return EXIT_FAILURE;
     }
 

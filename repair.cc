@@ -24,14 +24,16 @@
 #include <cstdio>
 #include <iostream>
 #include <memory>
+#include <cstring>
 
 #include "db.hpp"
 
 #include "mcbekey.hpp"
 
-int main(int argc, char *argv[]) {
-    if(argc < 2) {
-        printf("Usage: %s <minecraft_world_dir>\n", argv[0]);
+int repair_main(int argc, char *argv[]) {
+
+    if(argc < 3 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s repair <minecraft_world_dir>\n", argv[0]);
         return EXIT_FAILURE;
     }
 

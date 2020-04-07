@@ -5,9 +5,23 @@
 **Backup all minecraft worlds before using these tools.**
 Editing your save games can be really dangerous and have unexpected results.
 
+## Compiling
+
+If you want to compile mcberepair, you need to install [CMake](https://cmake.org/).
+If you have a recent version of CMake, you can compile it with the following commands.
+
+```
+cd path/to/mcberepair/source/code
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+After this runs successfully, you will have an `mcberepair` binary in your `./build` directory.
+Run `./mcberepair help` from the build directory to see a list of available commands.
+
 ## listkeys
 
-`listkeys` lists all the keys in a world's leveldb database. Output is a tab-separated file
+`mcberepair listkeys` lists all the keys in a world's leveldb database. Output is a tab-separated file
 with seven columns and a header.
 Plain text keys are [percent encoded](https://en.wikipedia.org/wiki/Percent-encoding) and placed in column 1.
 Keys that represent chunk data being with `@` and are in the format
@@ -42,7 +56,7 @@ portals	10995
 
 ## rmkeys
 
-`rmkeys` deletes keys in a world's leveldb database.
+`mcberepair rmkeys` deletes keys in a world's leveldb database.
 Input is a list of keys, one per line.
 
 ### Example Input
@@ -69,62 +83,70 @@ Dumps the binary contents of a value to stdout.
 
 Puts a value into the database. Reads binary data from stdin.
 
+## repair
+
+Attempts to fix a broken database and recover as much data as possible.
+
+## copyall
+
+Copies all data from one database to a fresh location.
+
 ## Examples
 
 These examples run in a bash command prompt, and can be modified to run in a windows
 command prompt.
-Some use `awk` to filter the output of `listkeys`.
+Some use `awk` to filter the output of `mcberepair listkeys`.
 Replace `t5BPXQwUAQA=` with a path to the minecraft world folder that is being edited.
 
 ### Reset the Nether and Portals
 
 ```
-listkeys t5BPXQwUAQA= > list.tsv
+mcberepair listkeys t5BPXQwUAQA= > list.tsv
 awk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
 
-rmkeys t5BPXQwUAQA= < netherkeys.txt
-rmkeys t5BPXQwUAQA= portals Nether
+mcberepair rmkeys t5BPXQwUAQA= < netherkeys.txt
+mcberepair rmkeys t5BPXQwUAQA= portals Nether
 ```
 
 ### Reset the End
 
 ```
-listkeys t5BPXQwUAQA= > list.tsv
+mcberepair listkeys t5BPXQwUAQA= > list.tsv
 awk '$3 == 2 {print $1}' list.tsv > endkeys.txt
 
-rmkeys t5BPXQwUAQA= < endkeys.txt
-rmkeys t5BPXQwUAQA= TheEnd
+mcberepair rmkeys t5BPXQwUAQA= < endkeys.txt
+mcberepair rmkeys t5BPXQwUAQA= TheEnd
 ```
 
 ### Reset Overworld chunks that are greater than 100 chunks from 0,0
 
 ```
-listkeys t5BPXQwUAQA= > list.tsv
+mcberepair listkeys t5BPXQwUAQA= > list.tsv
 awk '$3 == 0 && sqrt($4^2+$5^2) > 100 {print $1}' list.tsv > farkeys.txt
 
-rmkeys t5BPXQwUAQA= < farkeys.txt
+mcberepair rmkeys t5BPXQwUAQA= < farkeys.txt
 ```
 
 ### Copy the data from one key to another
 
 ```
-dumpkey t5BPXQwUAQA= '@0:0:2:47-0' > subchunk.bin
-writekey t5BPXQwUAQA= '@0:1:2:47-0' < subchunk.bin
+mcberepair dumpkey t5BPXQwUAQA= '@0:0:2:47-0' > subchunk.bin
+mcberepair writekey t5BPXQwUAQA= '@0:1:2:47-0' < subchunk.bin
 ```
 
 ### Print keys that don't belong to any chunk
 
 ```
-listkeys t5BPXQwUAQA= > list.tsv
+mcberepair listkeys t5BPXQwUAQA= > list.tsv
 awk '$3 == ""' list.tsv
 ```
 
 ### Delete all pending ticks records above 4096 bytes in size.
 
 ```
-listkeys t5BPXQwUAQA= > list.tsv
+mcberepair listkeys t5BPXQwUAQA= > list.tsv
 awk '$6 == 51 && $2 > 4096 {print $1}' list.tsv > pending_ticks.tsv
-rmkeys t5BPXQwUAQA= < pending_ticks.tsv
+mcberepair rmkeys t5BPXQwUAQA= < pending_ticks.tsv
 ```
 
 ## References

@@ -36,9 +36,9 @@
 #include "mcbekey.hpp"
 #include "slurp.hpp"
 
-int main(int argc, char* argv[]) {
-    if(argc < 3) {
-        printf("Usage: %s <minecraft_world_dir> <key> < input.bin\n", argv[0]);
+int writekey_main(int argc, char* argv[]) {
+    if(argc < 4 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s writekey <minecraft_world_dir> <key> < input.bin\n", argv[0]);
         return EXIT_FAILURE;
     }
 

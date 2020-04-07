@@ -68,10 +68,17 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
-foreach(NAME listkeys rmkeys dumpkey writekey repair copy)
-	add_executable(${NAME} ${NAME}.cc)
-	target_link_libraries(${NAME} leveldb)
-endforeach()
+add_executable(mcberepair main.cc
+  listkeys.cc
+  rmkeys.cc
+  dumpkey.cc
+  writekey.cc
+  repair.cc
+  copyall.cc
+)
+target_link_libraries(mcberepair leveldb)
+target_include_directories(mcberepair PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+add_dependencies(mcberepair configure-version.h)
 
 # Setup a target that will build version.h.in -> version.h
 set(configure_script_code "

@@ -33,13 +33,13 @@
 
 #include "mcbekey.hpp"
 
-int main(int argc, char* argv[]) {
-    std::string value;
-
-    if(argc < 3) {
-        printf("Usage: %s <minecraft_world_dir> <key> > output.bin\n", argv[0]);
+int dumpkey_main(int argc, char* argv[]) {
+    if(argc < 4 || strcmp("help", argv[1])==0) {
+        printf("Usage: %s dumpkey <minecraft_world_dir> <key> > output.bin\n", argv[0]);
         return EXIT_FAILURE;
     }
+    std::string value;
+
 
     // use RAII to close the db before dumping value
     {
