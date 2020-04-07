@@ -140,11 +140,11 @@ inline std::string decode_key(std::string_view key) {
     if(!(str >> chunk.z)) {
         return {};
     }
-    if(!(str >> chunk.dimension)) {
-        return {};
-    }
     if(str.peek() == ':') {
         str.ignore();
+    }
+    if(!(str >> chunk.dimension)) {
+        return {};
     }
     unsigned int tag;
     if(str.peek() == ':') {

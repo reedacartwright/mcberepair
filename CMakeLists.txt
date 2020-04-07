@@ -1,13 +1,58 @@
+# Copyright (c) 2019-2020 Reed A. Cartwright <reed@cartwright.ht>
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 cmake_minimum_required(VERSION 3.12)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0074 NEW)
+
+set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
+if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+  message(FATAL_ERROR "In-source builds not allowed. Please run CMake from the './build' directory. You may need to remove CMakeCache.txt.")
+endif()
+
+################################################################################
+#  Project Configuration
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+set(CMAKE_BUILD_TYPE_INIT "RelWithDebInfo")
+set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ON)
 
-project(mcberepair VERSION 0.1 LANGUAGES CXX)
+################################################################################
+# Init Project
+
+project(mcberepair VERSION 0.1
+  DESCRIPTION "Minecraft Bedrock Utilities"
+  HOMEPAGE_URL "https://github.com/reedacartwright/mcberepair/"
+  LANGUAGES CXX
+)
+
+# Gitmeta data and semantic versioning
+include("conf/gitmeta.cmake")
+include("conf/semver.cmake")
+
+add_semver_file(${CMAKE_PROJECT_NAME} METADATA_GIT)
 
 option(LEVELDB_BUILD_TESTS OFF)
 add_subdirectory(leveldb-mcpe)
@@ -28,4 +73,23 @@ foreach(NAME listkeys rmkeys dumpkey writekey repair copy)
 	target_link_libraries(${NAME} leveldb)
 endforeach()
 
-configure_file(mcberepair.sublime-project.in mcberepair.sublime-project @ONLY)
+# Setup a target that will build version.h.in -> version.h
+set(configure_script_code "
+include(\"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.version\")\n
+")
+add_configured_file(version.h
+    INPUT "${CMAKE_CURRENT_SOURCE_DIR}/version.h.in"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/version.h"
+    EXTRA_DEPS "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.version"
+    VARIABLES ${CMAKE_PROJECT_NAME}_SEMVER_VERSION
+              ${CMAKE_PROJECT_NAME}_SEMVER_INTEGER
+              ${CMAKE_PROJECT_NAME}_SEMVER_MAJOR
+              ${CMAKE_PROJECT_NAME}_SEMVER_MINOR
+              ${CMAKE_PROJECT_NAME}_SEMVER_PATCH
+)
+add_dependencies(configure-version.h configure-${CMAKE_PROJECT_NAME}.version)
+unset(configure_script_code)
+
+# Add Project File for sublime
+configure_file(${CMAKE_PROJECT_NAME}.sublime-project.in ${CMAKE_PROJECT_NAME}.sublime-project @ONLY)
+
