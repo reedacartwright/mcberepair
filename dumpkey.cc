@@ -74,7 +74,7 @@ int dumpkey_main(int argc, char* argv[]) {
 
 #ifdef _WIN32
     fflush(stdout);
-    _setmode(fileno(stdout), O_BINARY);
+    _setmode(_fileno(stdout), O_BINARY);
 #endif
 
     size_t ret = fwrite(value.data(), value.size(),1,stdout);
