@@ -74,10 +74,10 @@ int dumpkey_main(int argc, char* argv[]) {
 
 #ifdef _WIN32
     fflush(stdout);
-    setmode(fileno(stdout), O_BINARY);
+    _setmode(fileno(stdout), O_BINARY);
 #endif
 
-    int ret = fwrite(value.data(), value.size(),1,stdout);
+    size_t ret = fwrite(value.data(), value.size(),1,stdout);
     if(ret < 1) {
         return EXIT_FAILURE;
     }

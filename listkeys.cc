@@ -62,7 +62,7 @@ int listkeys_main(int argc, char* argv[]) {
         // print an encoded key
         std::string enckey = mcberepair::encode_key({key.data(),key.size()});
         printf("%s", enckey.c_str());
-        printf("\t%lu", it->value().size());
+        printf("\t%zu", it->value().size());
 
         // Identify keys that might represent chunks
         if(mcberepair::is_chunk_key({key.data(),key.size()})) {

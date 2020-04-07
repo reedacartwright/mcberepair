@@ -44,7 +44,7 @@ int writekey_main(int argc, char* argv[]) {
 
 #ifdef _WIN32
     fflush(stdin);
-    setmode(fileno(stdin), O_BINARY);
+    _setmode(fileno(stdin), O_BINARY);
 #endif
 
     // slurp from stdin into value before we open db
