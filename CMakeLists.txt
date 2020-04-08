@@ -102,9 +102,8 @@ install(TARGETS mcberepair RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # copy any dlls installed by vcpkg on windows
 if(VCPKG_APPLOCAL_DEPS AND VCPKG_TARGET_TRIPLET MATCHES "windows|uwp")
-  install(DIRECTORY $<TARGET_FILE_DIR:mcberepair>
-    TYPE BIN
-    FILES_MATCHING PATTERN "*.dll")
+  install(DIRECTORY $<TARGET_FILE_DIR:mcberepair>/
+    TYPE BIN FILES_MATCHING PATTERN "*.dll")
 endif()
 
 # Setup a target that will build version.h.in -> version.h
