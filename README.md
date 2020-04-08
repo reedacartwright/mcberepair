@@ -151,7 +151,7 @@ Replace `t5BPXQwUAQA=` with a path to the minecraft world folder that is being e
 
 ```
 mcberepair listkeys t5BPXQwUAQA= > list.tsv
-awk '$3 == 1 {print $1}' list.tsv > netherkeys.txt
+awk '$5 == 1 {print $1}' list.tsv > netherkeys.txt
 
 mcberepair rmkeys t5BPXQwUAQA= < netherkeys.txt
 mcberepair rmkeys t5BPXQwUAQA= portals Nether
@@ -161,7 +161,7 @@ mcberepair rmkeys t5BPXQwUAQA= portals Nether
 
 ```
 mcberepair listkeys t5BPXQwUAQA= > list.tsv
-awk '$3 == 2 {print $1}' list.tsv > endkeys.txt
+awk '$5 == 2 {print $1}' list.tsv > endkeys.txt
 
 mcberepair rmkeys t5BPXQwUAQA= < endkeys.txt
 mcberepair rmkeys t5BPXQwUAQA= TheEnd
@@ -171,7 +171,7 @@ mcberepair rmkeys t5BPXQwUAQA= TheEnd
 
 ```
 mcberepair listkeys t5BPXQwUAQA= > list.tsv
-awk '$3 == 0 && sqrt($4^2+$5^2) > 100 {print $1}' list.tsv > farkeys.txt
+awk '$5 == 0 && sqrt($3^2+$4^2) > 100 {print $1}' list.tsv > farkeys.txt
 
 mcberepair rmkeys t5BPXQwUAQA= < farkeys.txt
 ```
