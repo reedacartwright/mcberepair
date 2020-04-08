@@ -44,7 +44,7 @@ int dumpkey_main(int argc, char* argv[]) {
     // use RAII to close the db before dumping value
     {
 	    // construct path for Minecraft BE database
-	    std::string path = std::string(argv[1]) + "/db";
+	    std::string path = std::string(argv[2]) + "/db";
 
 	    // open the database
 	    mcberepair::DB db{path.c_str()};
@@ -61,12 +61,12 @@ int dumpkey_main(int argc, char* argv[]) {
 	    readOptions.decompress_allocator = decompress_allocator.get();
 	    readOptions.verify_checksums = true;
 
-	    std::string key = mcberepair::decode_key(argv[2]);
+	    std::string key = mcberepair::decode_key(argv[3]);
 
 	    leveldb::Status status = db().Get(readOptions, key, &value);
 
 	    if(!status.ok()) {
-	        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
+	        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[3],
 	                status.ToString().c_str());
 	        return EXIT_FAILURE;
 	    }

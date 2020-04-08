@@ -34,7 +34,7 @@ int listkeys_main(int argc, char* argv[]) {
     }
 
     // construct path for Minecraft BE database
-    std::string path = std::string(argv[1]) + "/db";
+    std::string path = std::string(argv[2]) + "/db";
 
     // open the database
     mcberepair::DB db{path.c_str()};

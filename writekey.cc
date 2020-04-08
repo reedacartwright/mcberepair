@@ -51,7 +51,7 @@ int writekey_main(int argc, char* argv[]) {
     auto value = mcberepair::slurp_string(std::cin);
 
     // construct path for Minecraft BE database
-    std::string path = std::string(argv[1]) + "/db";
+    std::string path = std::string(argv[2]) + "/db";
 
     // open the database
     mcberepair::DB db{path.c_str()};
@@ -61,12 +61,12 @@ int writekey_main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    std::string key = mcberepair::decode_key(argv[2]);
+    std::string key = mcberepair::decode_key(argv[3]);
 
     leveldb::Status status = db().Put({}, key, value);
 
     if(!status.ok()) {
-        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[2],
+        fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[3],
                 status.ToString().c_str());
         return EXIT_FAILURE;
     }
