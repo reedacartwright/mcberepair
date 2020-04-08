@@ -100,6 +100,13 @@ target_include_directories(mcberepair PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 add_dependencies(mcberepair configure-version.h)
 install(TARGETS mcberepair RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
+# copy any dlls installed by vcpkg on windows
+if(VCPKG_APPLOCAL_DEPS AND VCPKG_TARGET_TRIPLET MATCHES "windows|uwp")
+  install(DIRECTORY $<TARGET_FILE_DIR:mcberepair>
+    TYPE BIN
+    FILES_MATCHING PATTERN "*.dll")
+endif()
+
 # Setup a target that will build version.h.in -> version.h
 set(configure_script_code "
 include(\"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.version\")\n
