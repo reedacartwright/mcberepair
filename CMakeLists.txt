@@ -55,6 +55,7 @@ include("conf/semver.cmake")
 add_semver_file(${CMAKE_PROJECT_NAME} METADATA_GIT)
 
 option(LEVELDB_BUILD_TESTS OFF)
+option(LEVELDB_INSTALL OFF)
 add_subdirectory(leveldb-mcpe)
 
 # GOOGLE disables RTTI for leveldb so we will do the same
@@ -68,6 +69,24 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
+################################################################################
+# Installation Information
+
+string(TOLOWER ${CMAKE_PROJECT_NAME} basename_for_install)
+
+set(CMAKE_DATA_DIR "share/${basename_for_install}" CACHE STRING
+  "Install location for data (relative to prefix).")
+set(CMAKE_DOC_DIR "doc/${basename_for_install}" CACHE STRING
+  "Install location for documentation (relative to prefix).")
+set(CMAKE_MAN_DIR "man" CACHE STRING
+  "Install location for man pages (relative to prefix).")
+mark_as_advanced(CMAKE_DATA_DIR CMAKE_DOC_DIR CMAKE_MAN_DIR)
+
+install(FILES README.md LICENSE DESTINATION ${CMAKE_DOC_DIR})
+
+################################################################################
+# Building binary
+
 add_executable(mcberepair main.cc
   listkeys.cc
   rmkeys.cc
@@ -79,6 +98,7 @@ add_executable(mcberepair main.cc
 target_link_libraries(mcberepair leveldb)
 target_include_directories(mcberepair PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 add_dependencies(mcberepair configure-version.h)
+install(TARGETS mcberepair RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # Setup a target that will build version.h.in -> version.h
 set(configure_script_code "
@@ -100,3 +120,54 @@ unset(configure_script_code)
 # Add Project File for sublime
 configure_file(${CMAKE_PROJECT_NAME}.sublime-project.in ${CMAKE_PROJECT_NAME}.sublime-project @ONLY)
 
+################################################################################
+# Packaging
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_VENDOR "Reed A. Cartwright, PhD")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Commandline tools for Minecraft: Bedrock Edition.")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(mcberepair_package_version 
+  ${mcberepair_VERSION_MAJOR}
+  ${mcberepair_VERSION_MINOR}
+  ${mcberepair_VERSION_PATCH}
+)
+
+if("${mcberepair_VERSION_PATCH}" STREQUAL "")
+  list(APPEND mcberepair_package_version "0-prerelease")
+endif()
+
+list(JOIN mcberepair_package_version "." CPACK_PACKAGE_VERSION)
+
+set(CPACK_PACKAGE_CHECKSUM "SHA256")
+
+IF(WIN32 AND NOT UNIX)
+  set(CPACK_GENERATOR "ZIP")
+  set(CPACK_SOURCE_GENERATOR "ZIP")
+ELSE()
+  set(CPACK_GENERATOR "TGZ")
+  set(CPACK_SOURCE_GENERATOR "TGZ")
+ENDIF()
+
+set(CPACK_SOURCE_IGNORE_FILES
+  # Files specific to version control.
+  "/\\\\.git/"
+  "/\\\\.gitattributes$"
+  "/\\\\.gitmodules$"  
+  "/\\\\.github/"
+  "/\\\\.gitignore$"
+  "/\\\\.hooks-config$"
+
+  # Build directory
+  "/\\\\build/"
+
+  # Temporary files.
+  "\\\\.swp$"
+  "\\\\.#"
+  "/#"
+  "~$"
+  )
+
+include(CPack)
