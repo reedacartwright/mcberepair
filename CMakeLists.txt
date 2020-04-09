@@ -48,6 +48,9 @@ project(mcberepair VERSION 0.1
   LANGUAGES CXX
 )
 
+## Enable Developer CMake Flags
+include("conf/devopt.cmake")
+
 # Gitmeta data and semantic versioning
 include("conf/gitmeta.cmake")
 include("conf/semver.cmake")
@@ -111,6 +114,10 @@ if(VCPKG_APPLOCAL_DEPS AND VCPKG_TARGET_TRIPLET MATCHES "windows|uwp")
   install(DIRECTORY $<TARGET_FILE_DIR:mcberepair>/
     TYPE BIN FILES_MATCHING PATTERN "*.dll")
 endif()
+
+# developer tools
+clang_format_target(mcberepair)
+clang_tidy_target(mcberepair)
 
 # Setup a target that will build version.h.in -> version.h
 set(configure_script_code "
