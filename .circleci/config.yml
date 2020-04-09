@@ -5,7 +5,6 @@ workflows:
   build-and-test:
     jobs: 
       - compile
-
 jobs:
   compile:
     docker:
