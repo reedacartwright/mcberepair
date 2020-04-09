@@ -8,7 +8,7 @@ workflows:
       - compile
       - test:
           requires:
-            - build
+            - compile
 jobs:
   compile:
     docker:
