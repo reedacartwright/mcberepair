@@ -131,6 +131,8 @@ endif()
 clang_format_target(mcberepair)
 clang_tidy_target(mcberepair)
 
+target_link_libraries(mcberepair devopt_coverage)
+
 # Setup a target that will build version.h.in -> version.h
 set(configure_script_code "
 include(\"${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.version\")\n
