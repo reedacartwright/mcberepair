@@ -34,7 +34,7 @@ int rmkeys_main(int argc, char *argv[]);
 int writekey_main(int argc, char *argv[]);
 int help_main(int argc, char *argv[]);
 
-int version_main(int argc, char *argv[]) {
+int version_main(int /*argc*/, char */*argv*/[]) {
     printf("mcberepair v" MCBEREPAIR_VERSION "\n");
     return EXIT_SUCCESS;
 }
