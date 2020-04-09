@@ -7,10 +7,10 @@ workflows:
       - compile
 
 jobs:
-  - compile:
-      docker:
-        - image: gcc8
-      steps:
+  compile:
+    docker:
+      - image: gcc8
+    steps:
       - checkout
       - run:
           name: Updating Packages
