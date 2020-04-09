@@ -82,17 +82,16 @@ inline void percent_decode_core(std::string *str, size_t start) {
     assert((*str)[start] == '%');
     auto p = str->begin() + start;
     auto q = p;
-    int a, b;
     do {
         assert(*p == '%');
         if(++p == str->end()) {
             break;
         }
-        a = hex_decode(*p);
+        int a = hex_decode(*p);
         if(++p == str->end()) {
             break;
         }
-        b = hex_decode(*p);
+        int b = hex_decode(*p);
         if(a != -1 && b != -1) {
             *q++ = a * 16 + b;
         }

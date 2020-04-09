@@ -38,7 +38,7 @@ class NullLogger : public leveldb::Logger {
 
 class DB {
    public:
-    DB(const char* path, bool create_if_missing = false,
+    explicit DB(const char* path, bool create_if_missing = false,
        bool error_if_exists = false)
         : options_{},
           filter_policy_{leveldb::NewBloomFilterPolicy(10)},
