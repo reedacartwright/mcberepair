@@ -70,6 +70,12 @@ else()
 endif()
 
 ################################################################################
+# Testing
+
+enable_testing()
+add_subdirectory(tests)
+
+################################################################################
 # Installation Information
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} basename_for_install)

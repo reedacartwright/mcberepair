@@ -1,0 +1,1 @@
+^Usage: [^\n]+mcberepair <command> \[args\]
