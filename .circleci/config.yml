@@ -10,10 +10,12 @@ referenced:
     run:
       name: Dependencies
       command: |
+        pwd
         sudo apt-get install -y rsync
         sudo python -m pip install --upgrade pip
         sudo python -m pip install scikit-ci-addons
         sudo ci_addons circle/install_cmake.py 3.17.1
+      working_directory: '~/'
 workflows:
   build-and-test:
     jobs: 
@@ -25,13 +27,13 @@ jobs:
   compile:
     <<: *defaults
     steps:
+      - *dependencies
       - checkout
       - run:
           name: Update Git Submodules
           command: |
             git submodule sync
             git submodule update --init
-      - *dependencies
       - run:
           name: Creating Build Files
           command: 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DDEVOPT_ENABLE_COVERAGE_REPORT=On'
@@ -44,16 +46,17 @@ jobs:
   test:
     <<: *defaults
     steps:
+      - *dependencies
       - attach_workspace:
           at: ./
-      - *dependencies
       - run:
           name: Running Tests
-          command: |
-            cd build
-            ctest -V -j 2 -T Test
+          command: ctest -V -j 2 -T Test
+          working_directory: build
       - run:
           name: Converting Test Output
           command: |
-            mkdir ${CIRCLE_TEST_REPORTS}/CTest
-            ci_addons ctest_junit_formatter BUILD_DIR > ${CIRCLE_TEST_REPORTS}/CTest/JUnit-${CIRCLE_NODE_INDEX}.xml
+            mkdir -p /tmp/test-results/CTest
+            ci_addons ctest_junit_formatter > /tmp/test-results/CTest/results.xml
+      - store_test_results:
+          path: /tmp/test-results
