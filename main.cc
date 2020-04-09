@@ -34,7 +34,7 @@ int rmkeys_main(int argc, char *argv[]);
 int writekey_main(int argc, char *argv[]);
 int help_main(int argc, char *argv[]);
 
-int version_main(int /*argc*/, char */*argv*/[]) {
+int version_main(int /*argc*/, char * /*argv*/[]) {
     printf("mcberepair v" MCBEREPAIR_VERSION "\n");
     return EXIT_SUCCESS;
 }
@@ -47,7 +47,7 @@ struct command_t {
     const char *desc;
 };
 
-// clang-format off 
+// clang-format off
 const command_t commands[] = {
     {"copyall",  copyall_main,  "Copy the entire contents from one world to an empty world."},
     {"dumpkey",  dumpkey_main,  "Dump the contents of a key to stdout."},
@@ -58,7 +58,7 @@ const command_t commands[] = {
     {"help",     help_main,     "Print help information."},
     {"version",  version_main,  "Print version information."},
     {nullptr, nullptr, nullptr}};
-// clang-format on 
+// clang-format on
 
 int main(int argc, char *argv[]) {
     if(argc < 2) {

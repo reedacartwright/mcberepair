@@ -72,10 +72,18 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
 endif()
 
-################################################################################
-# Testing
-
+## Turn on unit and executable testing
 enable_testing()
+#include("conf/doctest.cmake")
+
+set(pretest_all ALL)
+if(DEVOPT_EXCLUDE_PRETEST_FROM_ALL)
+  set(pretest_all)
+endif()
+
+add_custom_target(pretest ${pretest_all})
+add_dependencies(pretest configure)
+
 add_subdirectory(tests)
 
 ################################################################################
