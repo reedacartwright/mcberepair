@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   codecov: codecov/codecov@1.0.2
+  build-tools: circleci/build-tools@2.6.3
 workflows:
   build-and-test:
     jobs: 
@@ -13,6 +14,7 @@ jobs:
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
+      - build-tools/install-ci-tools
       - run:
           name: Updating Packages
           command: 'apt-get update'
@@ -21,10 +23,11 @@ jobs:
           command: 'apt-get install -y cmake'
       - run:
           name: Creating Build Files
-          command: 'cmake -S. -Bbuild/circleci -DDEVOPT_EXCLUDE_PRETEST_FROM_ALL=On'
+          command: 'cmake -S. -Bbuild/circleci -DCMAKE_BUILD_TYPE=Debug -DDEVOPT_ENABLE_COVERAGE_REPORT=On'
       - run:
           name: Building All
           command: 'cmake --build build/circleci -j 2'
+
 
 #  - codecov/upload:
 #          file: {{ coverage_report_filepath }}
