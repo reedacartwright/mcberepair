@@ -78,6 +78,8 @@ jobs:
       - run:
           name: Checking Source Code Format
           command: 'cmake --build build --target check_format -j 2'
+      - store_artifacts:
+          path: build/check_format_mcberepair.xml
   check_tidy:
     <<: *defaults
     steps:
@@ -87,6 +89,8 @@ jobs:
       - run:
           name: Checking Source with ClangTidy
           command: 'cmake --build build --target check_tidy -j 2'
+      - store_artifacts:
+          path: build/check_tidy_mcberepair.txt
   check_cppcheck:
     <<: *defaults
     steps:
@@ -96,3 +100,5 @@ jobs:
       - run:
           name: Checking Source with Cppcheck
           command: 'cmake --build build --target check_cppcheck -j 2'
+      - store_artifacts:
+          path: build/cppcheck_results.xml
