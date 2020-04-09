@@ -1,16 +1,16 @@
 /*
 # Copyright (c) 2019 Reed A. Cartwright <reed@cartwright.ht>
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,18 +22,17 @@
 #ifndef MCBEREPAIR_PERENC_HPP
 #define MCBEREPAIR_PERENC_HPP
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 #include <string_view>
-#include <algorithm>
 
 namespace mcberepair {
 
 std::string percent_encode(std::string_view str);
 void percent_decode(std::string *str);
 
-inline
-std::string percent_encode(std::string_view str) {
+inline std::string percent_encode(std::string_view str) {
     auto is_notgraph = [](unsigned char c) {
         return std::isgraph(c) == 0 || c == '%' || c == '@';
     };
@@ -57,15 +56,14 @@ std::string percent_encode(std::string_view str) {
         // Find next character to encode
         bit = ++it;
         it = std::find_if(it, str.end(), is_notgraph);
-    } while( it != str.end());
+    } while(it != str.end());
     // Append tail
     ret.append(bit, str.end());
 
     return ret;
 }
 
-inline
-int hex_decode(char x) {
+inline int hex_decode(char x) {
     if('0' <= x && x <= '9') {
         return x - '0';
     }
@@ -78,8 +76,7 @@ int hex_decode(char x) {
     return -1;
 }
 
-inline
-void percent_decode_core(std::string *str, size_t start) {
+inline void percent_decode_core(std::string *str, size_t start) {
     assert(str != nullptr);
     assert(start < str->size());
     assert((*str)[start] == '%');
@@ -117,6 +114,6 @@ inline void percent_decode(std::string *str) {
     }
 }
 
-}
+}  // namespace mcberepair
 
-#endif // MCBEREPAIR_PERCENC_HPP
+#endif  // MCBEREPAIR_PERCENC_HPP

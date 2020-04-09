@@ -103,6 +103,10 @@ add_executable(mcberepair main.cc
   writekey.cc
   repair.cc
   copyall.cc
+  db.hpp
+  mcbekey.hpp
+  perenc.hpp
+  slurp.hpp
 )
 target_link_libraries(mcberepair leveldb)
 target_include_directories(mcberepair PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
