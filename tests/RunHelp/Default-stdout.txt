@@ -1,1 +1,2 @@
-^Usage: [^\n]+mcberepair <command> \[args\]
+^Usage: [^
+]*mcberepair <command> \[args\]
