@@ -1,5 +1,4 @@
 // suppression errors caused by contributed code
-*:*/contrib/*
 *:*/leveldb-mcpe/*
 
 // suppression two information messages

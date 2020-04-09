@@ -111,6 +111,7 @@ add_custom_target(cppcheck
     "--suppressions-list=${CMAKE_CURRENT_LIST_DIR}/cppcheck_suppressions.txt"
     --enable=all
     --inline-suppr
+    --quiet
   COMMENT "Looking for programming errors with Cppcheck ..."
 )
 add_dependencies(cppcheck configure)
@@ -122,6 +123,7 @@ add_custom_target(check_cppcheck
     --enable=all
     --inline-suppr
     --error-exitcode=2
+    --quiet
     --xml
     "--output-file=${CMAKE_BINARY_DIR}/cppcheck_results.xml"
   BYPRODUCTS

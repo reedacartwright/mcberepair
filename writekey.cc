@@ -43,7 +43,6 @@ int writekey_main(int argc, char* argv[]) {
     }
 
 #ifdef _WIN32
-    fflush(stdin);
     _setmode(_fileno(stdin), O_BINARY);
 #endif
 
