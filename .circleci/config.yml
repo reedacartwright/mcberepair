@@ -6,7 +6,7 @@ workflows:
   build-and-test:
     jobs: 
       - compile
-      - test
+      - test:
         requires:
           - build
 jobs:
@@ -15,7 +15,6 @@ jobs:
       - image: gcc:8
     steps:
       - build-tools/install-ci-tools
-      - run: 'apt-get update'
       - run: 'apt-get install -y cmake'
       - checkout
       - run: git submodule sync
@@ -34,7 +33,6 @@ jobs:
       - image: gcc:8
     steps:
       - build-tools/install-ci-tools
-      - run: 'apt-get update'
       - run: 'apt-get install -y cmake'
       - attach_workspace:
           at: ./
