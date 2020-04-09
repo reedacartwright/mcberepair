@@ -1,16 +1,16 @@
 /*
 # Copyright (c) 2019 Reed A. Cartwright <reed@cartwright.ht>
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,13 @@
 #include <memory>
 
 #include "db.hpp"
-
 #include "mcbekey.hpp"
 
 int rmkeys_main(int argc, char *argv[]) {
-    if(argc < 3 || strcmp("help", argv[1])==0) {
+    if(argc < 3 || strcmp("help", argv[1]) == 0) {
         printf("Usage: %s rmkeys <minecraft_world_dir> < keys.txt\n", argv[0]);
-        printf("       %s rmkeys <minecraft_world_dir> <key> <key> ...\n", argv[0]);
+        printf("       %s rmkeys <minecraft_world_dir> <key> <key> ...\n",
+               argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -63,7 +63,7 @@ int rmkeys_main(int argc, char *argv[]) {
 
     // handle keys passed as arguments
     if(argc > 3) {
-        for(int i=3;i<argc;++i) {
+        for(int i = 3; i < argc; ++i) {
             if(!delete_key(argv[i])) {
                 return EXIT_FAILURE;
             }

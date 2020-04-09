@@ -1,16 +1,16 @@
 /*
 # Copyright (c) 2020 Reed A. Cartwright <reed@cartwright.ht>
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,12 +26,14 @@
 #include <memory>
 
 #include "db.hpp"
-
 #include "mcbekey.hpp"
 
 int copyall_main(int argc, char *argv[]) {
-    if(argc < 4 || strcmp("help", argv[1])==0) {
-        printf("Usage: %s copyall <source_minecraft_world_dir> <dest_minecraft_world_dir>\n", argv[0]);
+    if(argc < 4 || strcmp("help", argv[1]) == 0) {
+        printf(
+            "Usage: %s copyall <source_minecraft_world_dir> "
+            "<dest_minecraft_world_dir>\n",
+            argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -72,18 +74,16 @@ int copyall_main(int argc, char *argv[]) {
         auto value = it->value();
         status = copy_db().Put({}, key, value);
         if(!status.ok()) {
-	        fprintf(stderr, "ERROR: copying key '%s' failed: %s\n",
-	        		key.ToString().c_str(),
-	                status.ToString().c_str());
-	        return EXIT_FAILURE;        	
+            fprintf(stderr, "ERROR: copying key '%s' failed: %s\n",
+                    key.ToString().c_str(), status.ToString().c_str());
+            return EXIT_FAILURE;
         }
     }
     copy_db().CompactRange(nullptr, nullptr);
 
     if(!status.ok()) {
         fprintf(stderr, "ERROR: copying '%s' to '%s' failed: %s\n",
-        		path.c_str(), copy_path.c_str(),
-                status.ToString().c_str());
+                path.c_str(), copy_path.c_str(), status.ToString().c_str());
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

@@ -1,16 +1,16 @@
 /*
 # Copyright (c) 2019 Reed A. Cartwright <reed@cartwright.ht>
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,8 +28,9 @@
 #include "mcbekey.hpp"
 
 int listkeys_main(int argc, char* argv[]) {
-    if(argc < 3 || strcmp("help", argv[1])==0) {
-        printf("Usage: %s listkeys <minecraft_world_dir> > list.tsv\n", argv[0]);
+    if(argc < 3 || strcmp("help", argv[1]) == 0) {
+        printf("Usage: %s listkeys <minecraft_world_dir> > list.tsv\n",
+               argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -60,16 +61,17 @@ int listkeys_main(int argc, char* argv[]) {
     for(it->SeekToFirst(); it->Valid(); it->Next()) {
         auto key = it->key();
         // print an encoded key
-        std::string enckey = mcberepair::encode_key({key.data(),key.size()});
+        std::string enckey = mcberepair::encode_key({key.data(), key.size()});
         printf("%s", enckey.c_str());
         printf("\t%zu", it->value().size());
 
         // Identify keys that might represent chunks
-        if(mcberepair::is_chunk_key({key.data(),key.size()})) {
+        if(mcberepair::is_chunk_key({key.data(), key.size()})) {
             // read chunk key
-            auto chunk = mcberepair::parse_chunk_key({key.data(),key.size()});
+            auto chunk = mcberepair::parse_chunk_key({key.data(), key.size()});
             // print chunk information
-            printf("\t%d\t%d\t%d\t%d\t", chunk.x, chunk.z, chunk.dimension, chunk.tag);
+            printf("\t%d\t%d\t%d\t%d\t", chunk.x, chunk.z, chunk.dimension,
+                   chunk.tag);
             if(chunk.subtag != -1) {
                 printf("%d", chunk.subtag);
             }
