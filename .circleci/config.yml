@@ -8,7 +8,7 @@ workflows:
 jobs:
   compile:
     docker:
-      - image: gcc8
+      - image: gcc:8
     steps:
       - checkout
       - run:
