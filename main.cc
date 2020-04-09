@@ -57,7 +57,8 @@ const command_t commands[] = {
     {"writekey", writekey_main, "Set the contents of a key in the world."},
     {"help",     help_main,     "Print help information."},
     {"version",  version_main,  "Print version information."},
-    {nullptr, nullptr, nullptr}};
+    {nullptr, nullptr, nullptr}
+};
 // clang-format on
 
 int main(int argc, char *argv[]) {

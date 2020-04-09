@@ -6,28 +6,40 @@ workflows:
   build-and-test:
     jobs: 
       - compile
+      - test
+
 jobs:
   compile:
     docker:
       - image: gcc:8
     steps:
+      - build-tools/install-ci-tools
+      - run: 'apt-get update'
+      - run: 'apt-get install -y cmake'
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
-      - build-tools/install-ci-tools
-      - run:
-          name: Updating Packages
-          command: 'apt-get update'
-      - run:
-          name: Installing CMake
-          command: 'apt-get install -y cmake'
       - run:
           name: Creating Build Files
-          command: 'cmake -S. -Bbuild/circleci -DCMAKE_BUILD_TYPE=Debug -DDEVOPT_ENABLE_COVERAGE_REPORT=On'
+          command: 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DDEVOPT_ENABLE_COVERAGE_REPORT=On'
       - run:
           name: Building All
-          command: 'cmake --build build/circleci -j 2'
-
+          command: 'cmake --build build -j 2'
+      - persist_to_workspace:
+          root: ./
+          paths: ./
+  test:
+    docker:
+      - image: gcc:8
+    steps:
+      - build-tools/install-ci-tools
+      - run: 'apt-get update'
+      - run: 'apt-get install -y cmake'
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Running Tests
+          command: 'cd build && ctest -j 2 --output-on-failure'
 
 #  - codecov/upload:
 #          file: {{ coverage_report_filepath }}

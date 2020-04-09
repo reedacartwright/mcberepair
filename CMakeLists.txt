@@ -118,7 +118,13 @@ add_executable(mcberepair main.cc
 )
 target_link_libraries(mcberepair leveldb)
 target_include_directories(mcberepair PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+# Enable Warnings
+target_compile_options(mcberepair PUBLIC
+  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall -Wextra>
+     $<$<CXX_COMPILER_ID:MSVC>:/W4>)
+
 add_dependencies(mcberepair configure-version.h)
+
 install(TARGETS mcberepair RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 # copy any dlls installed by vcpkg on windows
