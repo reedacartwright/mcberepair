@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(gcovr_html "coverage.html")
-set(gcovr_xml  "cobertura.xml")
+set(gcovr_html "${CMAKE_CURRENT_BINARY_DIR}/coverage.html")
+set(gcovr_xml  "${CMAKE_CURRENT_BINARY_DIR}/cobertura.xml")
 set(gcovr_exclude
   "${CMAKE_SOURCE_DIR}/leveldb-mcpe"
 )
@@ -45,6 +45,7 @@ if(Gcovr_FOUND)
       ${gcovr_exclude_}
       --html-details
       --output "${gcovr_html}"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
   )
   add_custom_target(coverage_html
     DEPENDS "${gcovr_html}"
@@ -59,6 +60,7 @@ if(Gcovr_FOUND)
       ${gcovr_exclude_}
       --xml
       --output "${gcovr_xml}"
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
   )
 
   add_custom_target(coverage_xml
