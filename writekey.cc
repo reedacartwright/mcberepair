@@ -60,7 +60,11 @@ int writekey_main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    std::string key = mcberepair::decode_key(argv[3]);
+    std::string key;
+    if(!mcberepair::decode_key(argv[3], &key)) {
+        fprintf(stderr, "ERROR: key '%s' is malformed\n", argv[3]);
+        return EXIT_FAILURE;
+    }
 
     leveldb::Status status = db().Put({}, key, value);
 

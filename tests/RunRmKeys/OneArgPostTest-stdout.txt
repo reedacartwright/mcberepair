@@ -1,8 +1,10 @@
+%40Test1	2					
 AutonomousEntities	32					
 BiomeData	316					
 HelloWorld	11					
 Nether	33					
 Overworld	33					
+Test%20%25%20%00	2					
 mobevents	94					
 portals	159					
 schedulerWT	78					

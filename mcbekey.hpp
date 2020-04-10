@@ -84,7 +84,8 @@ inline chunk_t parse_chunk_key(std::string_view key) {
     return ret;
 }
 
-inline std::string create_chunk_key(chunk_t chunk) {
+inline void create_chunk_key(chunk_t chunk, std::string *out) {
+    assert(out != nullptr);
     char buffer[16];
     std::memcpy(buffer + 0, &chunk.x, 4);
     std::memcpy(buffer + 4, &chunk.z, 4);
@@ -98,7 +99,7 @@ inline std::string create_chunk_key(chunk_t chunk) {
         off += 1;
         buffer[off] = chunk.subtag;
     }
-    return std::string{buffer, buffer + off + 1};
+    out->assign(buffer, buffer+off+1);
 }
 
 inline std::string encode_key(std::string_view key) {
@@ -117,50 +118,55 @@ inline std::string encode_key(std::string_view key) {
     return str.str();
 }
 
-inline std::string decode_key(std::string_view key) {
+inline bool decode_key(std::string_view key, std::string *out) {
+    assert(out != nullptr);
+    if(key.empty()) {
+        out->assign(key);
+        return true;
+    }
     if(key[0] != '@') {
-        std::string ret{key};
-        mcberepair::percent_decode(&ret);
-        return ret;
+        out->assign(key);
+        return mcberepair::percent_decode(out);
     }
     std::string buf{key.substr(1)};
     std::stringstream str(buf);
     chunk_t chunk;
     if(!(str >> chunk.x)) {
-        return {};
+        return false;
     }
     if(str.peek() == ':') {
         str.ignore();
     }
     if(!(str >> chunk.z)) {
-        return {};
+        return false;
     }
     if(str.peek() == ':') {
         str.ignore();
     }
     if(!(str >> chunk.dimension)) {
-        return {};
+        return false;
     }
     unsigned int tag;
     if(str.peek() == ':') {
         str.ignore();
     }
     if(!(str >> tag)) {
-        return {};
+        return false;
     }
     chunk.tag = tag;
     chunk.subtag = -1;
     if(str.peek() == '-') {
         str.ignore();
         if(!(str >> tag)) {
-            return {};
+            return false;
         }
         chunk.subtag = tag;
     }
-
-    auto ret = create_chunk_key(chunk);
-
-    return ret;
+    if(!str.eof()) {
+        return false;
+    }
+    create_chunk_key(chunk, out);
+    return true;
 }
 
 }  // namespace mcberepair

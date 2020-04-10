@@ -30,7 +30,7 @@
 namespace mcberepair {
 
 std::string percent_encode(std::string_view str);
-void percent_decode(std::string *str);
+bool percent_decode(std::string *str);
 
 inline std::string percent_encode(std::string_view str) {
     auto is_notgraph = [](unsigned char c) {
@@ -76,7 +76,7 @@ inline int hex_decode(char x) {
     return -1;
 }
 
-inline void percent_decode_core(std::string *str, size_t start) {
+inline bool percent_decode_core(std::string *str, size_t start) {
     assert(str != nullptr);
     assert(start < str->size());
     assert((*str)[start] == '%');
@@ -85,16 +85,17 @@ inline void percent_decode_core(std::string *str, size_t start) {
     do {
         assert(*p == '%');
         if(++p == str->end()) {
-            break;
+            return false;
         }
         int a = hex_decode(*p);
         if(++p == str->end()) {
-            break;
+            return false;
         }
         int b = hex_decode(*p);
-        if(a != -1 && b != -1) {
-            *q++ = a * 16 + b;
+        if(a == -1 || b == -1) {
+            return false;
         }
+        *q++ = a * 16 + b;
         for(++p; p != str->end(); ++p) {
             if(*p == '%') {
                 break;
@@ -103,14 +104,16 @@ inline void percent_decode_core(std::string *str, size_t start) {
         }
     } while(p != str->end());
     str->erase(q, str->end());
+    return true;
 }
 
-inline void percent_decode(std::string *str) {
+inline bool percent_decode(std::string *str) {
     assert(str != nullptr);
     auto pos = str->find('%');
     if(pos != std::string::npos) {
-        percent_decode_core(str, pos);
+        return percent_decode_core(str, pos);
     }
+    return true;
 }
 
 }  // namespace mcberepair

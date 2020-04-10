@@ -13,4 +13,8 @@ run_mcberepair(TwoArgs dumpkey "${test_db}" "HelloWorld")
 
 run_mcberepair(BadCommand dumpkey noexist nokey)
 
+run_mcberepair(UnknownKey dumpkey "${test_db}" "%40missing")
+
+run_mcberepair(BadKey dumpkey "${test_db}" "@")
+
 file(REMOVE_RECURSE "${test_db}")

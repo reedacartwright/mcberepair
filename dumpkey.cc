@@ -60,16 +60,18 @@ int dumpkey_main(int argc, char* argv[]) {
         readOptions.decompress_allocator = decompress_allocator.get();
         readOptions.verify_checksums = true;
 
-        std::string key = mcberepair::decode_key(argv[3]);
+        std::string key;
+        if(!mcberepair::decode_key(argv[3], &key)) {
+            fprintf(stderr, "ERROR: key '%s' is malformed\n", argv[3]);
+            return EXIT_FAILURE;
+        }
 
         leveldb::Status status = db().Get(readOptions, key, &value);
 
         if(!status.ok()) {
-            // LCOV_EXCL_START
-            fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[3],
+            fprintf(stderr, "ERROR: Reading key '%s' failed --- %s\n", argv[3],
                     status.ToString().c_str());
             return EXIT_FAILURE;
-            // LCOV_EXCL_STOP
         }
     }
 

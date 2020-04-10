@@ -74,21 +74,39 @@ function(run_mcberepair test)
     set(maybe_input_file "")
   endif()
   if(NOT RunMCBERepair_TEST_COMMAND)
-    set(RunMCBERepair_TEST_COMMAND ${RunMCBERepair_EXE} ${test_args})
+    set(RunMCBERepair_TEST_COMMAND "${RunMCBERepair_EXE}" ${test_args})
   endif()
   if(NOT RunMCBERepair_TEST_COMMAND_WORKING_DIRECTORY)
     set(RunMCBERepair_TEST_COMMAND_WORKING_DIRECTORY "${RunMCBERepair_TEST_BINARY_DIR}")
   endif()
-  execute_process(
-    COMMAND ${RunMCBERepair_TEST_COMMAND}
-    WORKING_DIRECTORY "${RunMCBERepair_TEST_COMMAND_WORKING_DIRECTORY}"
-    OUTPUT_VARIABLE actual_stdout
-    ERROR_VARIABLE ${actual_stderr_var}
-    RESULT_VARIABLE actual_result
-    ENCODING UTF8
-    ${maybe_timeout}
-    ${maybe_input_file}
-    )
+  if( ${ARGC} GREATER 3 AND "${ARGV3}" STREQUAL "" )
+    # work around a CMAKE limitation for one of our tests
+    list(REMOVE_AT ARGV 0)
+    list(REMOVE_AT ARGV 0)
+    list(REMOVE_AT ARGV 0)
+    list(REMOVE_AT ARGV 0)
+    execute_process(
+      COMMAND "${RunMCBERepair_EXE}" "${ARGV1}" "${ARGV2}" "" ${ARGV} 
+      WORKING_DIRECTORY "${RunMCBERepair_TEST_COMMAND_WORKING_DIRECTORY}"
+      OUTPUT_VARIABLE actual_stdout
+      ERROR_VARIABLE ${actual_stderr_var}
+      RESULT_VARIABLE actual_result
+      ENCODING UTF8
+      ${maybe_timeout}
+      ${maybe_input_file}
+      )
+  else()
+    execute_process(
+      COMMAND ${RunMCBERepair_TEST_COMMAND}
+      WORKING_DIRECTORY "${RunMCBERepair_TEST_COMMAND_WORKING_DIRECTORY}"
+      OUTPUT_VARIABLE actual_stdout
+      ERROR_VARIABLE ${actual_stderr_var}
+      RESULT_VARIABLE actual_result
+      ENCODING UTF8
+      ${maybe_timeout}
+      ${maybe_input_file}
+      )
+  endif()
   set(msg "")
   if(NOT "${actual_result}" MATCHES "${expect_result}")
     string(APPEND msg "Result is [${actual_result}], not [${expect_result}].\n")
@@ -126,7 +144,7 @@ function(run_mcberepair test)
       "Actual stdout:\n${actual_out}\n"
       "${expect_err}"
       "Actual stderr:\n${actual_err}\n"
-      )
+    )
   else()
     message(STATUS "${test} - PASSED")
   endif()

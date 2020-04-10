@@ -74,17 +74,21 @@ int copyall_main(int argc, char *argv[]) {
         auto value = it->value();
         status = copy_db().Put({}, key, value);
         if(!status.ok()) {
+            // LCOV_EXCL_START
             fprintf(stderr, "ERROR: copying key '%s' failed: %s\n",
                     key.ToString().c_str(), status.ToString().c_str());
             return EXIT_FAILURE;
+            // LCOV_EXCL_STOP
         }
     }
     copy_db().CompactRange(nullptr, nullptr);
 
     if(!status.ok()) {
+        // LCOV_EXCL_START
         fprintf(stderr, "ERROR: copying '%s' to '%s' failed: %s\n",
                 path.c_str(), copy_path.c_str(), status.ToString().c_str());
         return EXIT_FAILURE;
+        // LCOV_EXCL_STOP
     }
     return EXIT_SUCCESS;
 }

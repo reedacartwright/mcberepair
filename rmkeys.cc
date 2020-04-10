@@ -51,8 +51,13 @@ int rmkeys_main(int argc, char *argv[]) {
 
     // Create a function that deletes the key.
     auto delete_key = [&](const std::string &line) -> bool {
+        std::string key;
+        if(!mcberepair::decode_key(line, &key)) {
+            printf("Skipping malformed key '%s'...\n", line.c_str());
+            return true;
+        }
         printf("Deleting key '%s'...\n", line.c_str());
-        status = db().Delete({}, mcberepair::decode_key(line));
+        status = db().Delete({}, key);
         if(!status.ok()) {
             // LCOV_EXCL_START
             fprintf(stderr, "ERROR: Writing '%s' failed: %s\n", path.c_str(),

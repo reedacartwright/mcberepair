@@ -38,4 +38,5 @@ add_RunMCBERepair_test(ListKeys)
 add_RunMCBERepair_test(RmKeys)
 add_RunMCBERepair_test(DumpKey)
 add_RunMCBERepair_test(WriteKey)
-
+add_RunMCBERepair_test(Repair)
+add_RunMCBERepair_test(Copyall)

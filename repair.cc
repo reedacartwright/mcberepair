@@ -49,7 +49,7 @@ int repair_main(int argc, char *argv[]) {
     status = leveldb::RepairDB(path, options);
 
     if(!status.ok()) {
-        fprintf(stderr, "ERROR: Repairing '%s' failed: %s\n", path.c_str(),
+        fprintf(stderr, "ERROR: Repairing '%s' failed --- %s\n", path.c_str(),
                 status.ToString().c_str());
         return EXIT_FAILURE;
     }

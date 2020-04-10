@@ -14,4 +14,8 @@ run_mcberepair(TwoArgsPostTest dumpkey "${test_db}" "test_record")
 
 run_mcberepair(BadCommand writekey noexist nokey)
 
+run_mcberepair(BigKey writekey "${test_db}" "test_record")
+
+run_mcberepair(BadKey writekey "${test_db}" "@")
+
 file(REMOVE_RECURSE "${test_db}")
