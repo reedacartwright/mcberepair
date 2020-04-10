@@ -10,7 +10,7 @@ run_mcberepair(OneArg rmkeys "${test_db}")
 run_mcberepair(OneArgPostTest listkeys "${test_db}")
 
 run_mcberepair(MultiArgs rmkeys "${test_db}"
-    "@31:-10:0:54" "@31:-10:0:118" "AutonomousEntities")
+    "@5:0:0:54" "@5:0:0:118" "AutonomousEntities" "@5:0:0:47-5")
 run_mcberepair(MultiArgsPostTest listkeys "${test_db}")
 
 run_mcberepair(BadCommand rmkeys noexist)

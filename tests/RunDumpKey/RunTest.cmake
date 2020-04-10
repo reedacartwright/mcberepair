@@ -9,7 +9,7 @@ run_mcberepair(Help help dumpkey)
 run_mcberepair(NoArgs dumpkey)
 run_mcberepair(OneArg dumpkey "${test_db}")
 
-run_mcberepair(TwoArgs dumpkey "${test_db}" "@0:0:0:118")
+run_mcberepair(TwoArgs dumpkey "${test_db}" "HelloWorld")
 
 run_mcberepair(BadCommand dumpkey noexist nokey)
 
