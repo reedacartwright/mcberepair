@@ -83,9 +83,11 @@ int listkeys_main(int argc, char* argv[]) {
     }
 
     if(!it->status().ok()) {
+        // LCOV_EXCL_START
         fprintf(stderr, "ERROR: Reading '%s' failed: %s\n", path.c_str(),
                 it->status().ToString().c_str());
         return EXIT_FAILURE;
+        // LCOV_EXCL_STOP
     }
     return EXIT_SUCCESS;
 }

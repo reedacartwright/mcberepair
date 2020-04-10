@@ -98,6 +98,6 @@ int help_main(int argc, char *argv[]) {
     fprintf(stderr,
             "ERROR: Command '%s' not found. Try '%s help' for a list of "
             "commands.\n",
-            argv[1], argv[0]);
+            argv[2], argv[0]);
     return EXIT_FAILURE;
 }

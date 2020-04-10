@@ -65,9 +65,11 @@ int writekey_main(int argc, char* argv[]) {
     leveldb::Status status = db().Put({}, key, value);
 
     if(!status.ok()) {
+        // LCOV_EXCL_START
         fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[3],
                 status.ToString().c_str());
         return EXIT_FAILURE;
+        // LCOV_EXCL_STOP
     }
 
     return EXIT_SUCCESS;

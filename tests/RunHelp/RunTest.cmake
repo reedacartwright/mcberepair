@@ -1,4 +1,5 @@
 include(RunMCBERepair)
 
-run_mcberepair(Default help)
-run_mcberepair(NoArgs)
+run_mcberepair(NoArgs help)
+run_mcberepair(HelpHelp help help)
+run_mcberepair(BadCommand help noexist)

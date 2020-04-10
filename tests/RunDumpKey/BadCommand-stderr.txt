@@ -1,0 +1,1 @@
+^ERROR: Opening 'noexist/db' failed.$

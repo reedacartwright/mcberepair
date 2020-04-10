@@ -54,9 +54,11 @@ int rmkeys_main(int argc, char *argv[]) {
         printf("Deleting key '%s'...\n", line.c_str());
         status = db().Delete({}, mcberepair::decode_key(line));
         if(!status.ok()) {
+            // LCOV_EXCL_START
             fprintf(stderr, "ERROR: Writing '%s' failed: %s\n", path.c_str(),
                     status.ToString().c_str());
             return false;
+            // LCOV_EXCL_STOP
         }
         return true;
     };
@@ -65,7 +67,8 @@ int rmkeys_main(int argc, char *argv[]) {
     if(argc > 3) {
         for(int i = 3; i < argc; ++i) {
             if(!delete_key(argv[i])) {
-                return EXIT_FAILURE;
+                return EXIT_FAILURE; // LCOV_EXCL_LINE 
+
             }
         }
         return EXIT_SUCCESS;
@@ -75,7 +78,7 @@ int rmkeys_main(int argc, char *argv[]) {
     std::string line;
     while(std::getline(std::cin, line)) {
         if(!delete_key(line)) {
-            return EXIT_FAILURE;
+            return EXIT_FAILURE; // LCOV_EXCL_LINE 
         }
     }
 

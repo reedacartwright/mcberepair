@@ -13,4 +13,8 @@ run_mcberepair(MultiArgs rmkeys "${test_db}"
     "@31:-10:0:54" "@31:-10:0:118" "AutonomousEntities")
 run_mcberepair(MultiArgsPostTest listkeys "${test_db}")
 
+run_mcberepair(BadCommand rmkeys noexist)
+
+run_mcberepair(Help help rmkeys)
+
 file(REMOVE_RECURSE "${test_db}")

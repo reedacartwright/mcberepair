@@ -65,9 +65,11 @@ int dumpkey_main(int argc, char* argv[]) {
         leveldb::Status status = db().Get(readOptions, key, &value);
 
         if(!status.ok()) {
+            // LCOV_EXCL_START
             fprintf(stderr, "ERROR: Reading key '%s' failed: %s\n", argv[3],
                     status.ToString().c_str());
             return EXIT_FAILURE;
+            // LCOV_EXCL_STOP
         }
     }
 
@@ -78,7 +80,7 @@ int dumpkey_main(int argc, char* argv[]) {
 
     size_t ret = fwrite(value.data(), value.size(), 1, stdout);
     if(ret < 1) {
-        return EXIT_FAILURE;
+        return EXIT_FAILURE; // LCOV_EXCL_LINE
     }
     return EXIT_SUCCESS;
 }

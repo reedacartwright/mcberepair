@@ -31,8 +31,11 @@ macro(add_RunMCBERepair_test test)
     )
 endmacro()
 
+add_RunMCBERepair_test(Main)
 add_RunMCBERepair_test(Version)
 add_RunMCBERepair_test(Help)
 add_RunMCBERepair_test(ListKeys)
 add_RunMCBERepair_test(RmKeys)
+add_RunMCBERepair_test(DumpKey)
+add_RunMCBERepair_test(WriteKey)
 
