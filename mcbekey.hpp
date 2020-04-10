@@ -99,7 +99,7 @@ inline void create_chunk_key(chunk_t chunk, std::string *out) {
         off += 1;
         buffer[off] = chunk.subtag;
     }
-    out->assign(buffer, buffer+off+1);
+    out->assign(buffer, buffer + off + 1);
 }
 
 inline std::string encode_key(std::string_view key) {
