@@ -42,7 +42,7 @@ set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ON)
 ################################################################################
 # Init Project
 
-project(mcberepair VERSION 0.1.0
+project(mcberepair VERSION 0.2
   DESCRIPTION "Minecraft Bedrock Utilities"
   HOMEPAGE_URL "https://github.com/reedacartwright/mcberepair/"
   LANGUAGES CXX
