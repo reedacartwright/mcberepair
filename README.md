@@ -1,5 +1,8 @@
 # mcberepair
 
+[![CircleCI](https://circleci.com/gh/reedacartwright/mcberepair/tree/master.svg?style=svg)](https://circleci.com/gh/reedacartwright/mcberepair/tree/master)
+[![codecov](https://codecov.io/gh/reedacartwright/mcberepair/branch/master/graph/badge.svg)](https://codecov.io/gh/reedacartwright/mcberepair)
+
 mcberepair is a set of command line utilities for [Minecraft: Bedrock Edition](https://www.minecraft.net/en-us/about-minecraft) worlds.
 This includes worlds generated on Windows 10, Android, XBox One, PS4, Switch, etc.
 Data in a Minecraft: BE world is stored in a
