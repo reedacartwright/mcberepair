@@ -80,7 +80,7 @@ int dumpkey_main(int argc, char* argv[]) {
 
     size_t ret = fwrite(value.data(), value.size(), 1, stdout);
     if(ret < 1) {
-        return EXIT_FAILURE; // LCOV_EXCL_LINE
+        return EXIT_FAILURE;  // LCOV_EXCL_LINE
     }
     return EXIT_SUCCESS;
 }

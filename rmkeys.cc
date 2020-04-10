@@ -67,8 +67,7 @@ int rmkeys_main(int argc, char *argv[]) {
     if(argc > 3) {
         for(int i = 3; i < argc; ++i) {
             if(!delete_key(argv[i])) {
-                return EXIT_FAILURE; // LCOV_EXCL_LINE 
-
+                return EXIT_FAILURE;  // LCOV_EXCL_LINE
             }
         }
         return EXIT_SUCCESS;
@@ -78,7 +77,7 @@ int rmkeys_main(int argc, char *argv[]) {
     std::string line;
     while(std::getline(std::cin, line)) {
         if(!delete_key(line)) {
-            return EXIT_FAILURE; // LCOV_EXCL_LINE 
+            return EXIT_FAILURE;  // LCOV_EXCL_LINE
         }
     }
 
