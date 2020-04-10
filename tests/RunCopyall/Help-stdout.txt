@@ -1,2 +1,2 @@
 Usage: [^
-]*mcberepair copyall <source_minecraft_world_dir> <dest_minecraft_world_dir>
+]*mcberepair(.exe)? copyall <source_minecraft_world_dir> <dest_minecraft_world_dir>

@@ -1,2 +1,2 @@
 ^Usage: [^
-]*mcberepair writekey <minecraft_world_dir> <key> < input.bin
+]*mcberepair(.exe)? writekey <minecraft_world_dir> <key> < input.bin

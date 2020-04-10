@@ -1,2 +1,2 @@
 ^Usage: [^
-]*mcberepair dumpkey <minecraft_world_dir> <key> > output.bin
+]*mcberepair(.exe)? dumpkey <minecraft_world_dir> <key> > output.bin

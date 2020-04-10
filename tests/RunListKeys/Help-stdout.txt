@@ -1,2 +1,2 @@
 Usage: [^
-]*mcberepair listkeys <minecraft_world_dir> > list.tsv
+]*mcberepair(.exe)? listkeys <minecraft_world_dir> > list.tsv

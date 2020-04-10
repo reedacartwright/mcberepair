@@ -1,2 +1,2 @@
 ^Usage: [^
-]*mcberepair <command> \[args\]
+]*mcberepair(.exe)? <command> \[args\]

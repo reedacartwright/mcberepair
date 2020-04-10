@@ -1,4 +1,4 @@
 Usage: [^
-]*mcberepair rmkeys <minecraft_world_dir> < keys.txt
+]*mcberepair(.exe)? rmkeys <minecraft_world_dir> < keys.txt
        [^
-]*mcberepair rmkeys <minecraft_world_dir> <key> <key> ...
+]*mcberepair(.exe)? rmkeys <minecraft_world_dir> <key> <key> ...

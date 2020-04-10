@@ -1,2 +1,2 @@
 ^ERROR: Command 'noexist' not found. Try '[^
-]*mcberepair help' for a list of commands.
+]*mcberepair(\.exe)? help' for a list of commands.
