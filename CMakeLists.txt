@@ -104,13 +104,14 @@ install(FILES README.md LICENSE DESTINATION ${CMAKE_DOC_DIR})
 ################################################################################
 # Building binary
 
-add_executable(mcberepair main.cc
-  listkeys.cc
-  rmkeys.cc
-  dumpkey.cc
-  writekey.cc
-  repair.cc
-  copyall.cc
+add_executable(mcberepair
+  main.cpp
+  listkeys.cpp
+  rmkeys.cpp
+  dumpkey.cpp
+  writekey.cpp
+  repair.cpp
+  copyall.cpp
   db.hpp
   mcbekey.hpp
   perenc.hpp
