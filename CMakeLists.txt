@@ -200,8 +200,14 @@ set(CPACK_SOURCE_IGNORE_FILES
   "/\\\\.gitignore$"
   "/\\\\.hooks-config$"
 
-  # Build directory
-  "/\\\\build/"
+  # Build directory contents
+  "/\\\\build/.+"
+
+  # Development
+  "/\\\\.circleci/"
+  "/\\\\.clang-format$"
+  "/\\\\.clang-tidy$"
+  "/\\\\.codecov.yml$"
 
   # Temporary files.
   "\\\\.swp$"
