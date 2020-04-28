@@ -1,2 +1,8 @@
 .gitattributes export-ignore
+.gitmodules export-ignore
+.gitignore export-ignore
 .ci export-ignore
+.circleci export-ignore
+.codecov.yml export-ignore
+.clang-format export-ignore
+.clang-tidy export-ignore
