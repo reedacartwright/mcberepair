@@ -42,6 +42,7 @@ if(Gcovr_FOUND)
       --root "${CMAKE_SOURCE_DIR}"
       --delete
       --exclude-unreachable-branches
+      --exclude-throw-branches
       ${gcovr_exclude_}
       --html-details
       --output "${gcovr_html}"
@@ -57,6 +58,7 @@ if(Gcovr_FOUND)
       --root "${CMAKE_SOURCE_DIR}"
       --delete
       --exclude-unreachable-branches
+      --exclude-throw-branches      
       ${gcovr_exclude_}
       --xml
       --output "${gcovr_xml}"
