@@ -61,6 +61,10 @@ jobs:
           name: Running Tests
           command: ctest -j 2 -T Test --output-on-failure
           working_directory: build
+      - run:
+          name: Running Lcov
+          command: bash .ci/lcov.sh
+          working_directory: build          
       - codecov/upload
       - run:
           name: Converting Test Output
