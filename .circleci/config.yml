@@ -10,7 +10,7 @@ referenced:
     run:
       name: Dependencies
       command: |
-        sudo apt-get install -y rsync clang-format cppcheck clang-tidy libperlio-gzip-perl
+        sudo apt-get install -y rsync clang-format cppcheck clang-tidy libperlio-gzip-perl libjson-perl
         sudo python -m pip install --upgrade pip
         sudo python -m pip install lxml scikit-ci-addons
         sudo ci_addons circle/install_cmake.py 3.17.1
