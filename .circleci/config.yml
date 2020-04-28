@@ -64,7 +64,8 @@ jobs:
       - run:
           name: Running LCOV
           command: bash .ci/lcov.bash build
-      - codecov/upload
+      - codecov/upload:
+          file: build/coverage.info
       - run:
           name: Converting Test Output
           command: |
