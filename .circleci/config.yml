@@ -63,8 +63,7 @@ jobs:
           working_directory: build
       - run:
           name: Running Lcov
-          command: bash .ci/lcov.sh
-          working_directory: build          
+          command: bash .ci/lcov.bash build
       - codecov/upload
       - run:
           name: Converting Test Output
