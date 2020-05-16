@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/reedacartwright/mcberepair/tree/master.svg?style=svg)](https://circleci.com/gh/reedacartwright/mcberepair/tree/master)
 [![codecov](https://codecov.io/gh/reedacartwright/mcberepair/branch/master/graph/badge.svg)](https://codecov.io/gh/reedacartwright/mcberepair)
-[![Discord Chat](https://img.shields.io/discord/710697981677928479.svg)](https://discord.gg/bxyyNh)  
+[![Discord Chat](https://img.shields.io/discord/710697981677928479.svg)](https://discord.gg/sWb4YmX)  
 
 mcberepair is a set of command line utilities for [Minecraft: Bedrock Edition](https://www.minecraft.net/en-us/about-minecraft) worlds.
 This includes worlds generated on Windows 10, Android, XBox One, PS4, Switch, etc.
