@@ -37,7 +37,7 @@ namespace mcberepair {
 
 inline bool is_chunk_key(std::string_view key) {
     auto tag_test = [](char tag) {
-        return ((45 <= tag && tag <= 64) || tag == 118);
+        return ((33 <= tag && tag <= 64) || tag == 118);
     };
 
     if(key.size() == 9 || key.size() == 10) {
